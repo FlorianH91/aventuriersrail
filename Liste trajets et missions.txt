@@ -1,0 +1,107 @@
+Calais - Dunkerque : 1 jaune
+Dunkerque - Lille : 2 bleus
+Dunkerque - Béthune : 3 rouges
+Béthune - Douai : 1 blanc
+Douai - Amiens : 2 bleus
+Douai - Valenciennes : 2 noirs
+Lille - Valenciennes : 4 oranges
+Valenciennes - Thionville : 5 noirs / 5 roses
+Valenciennes - Reims : 2 jaunes
+Amiens - Paris : 3 orange / 3 verts
+Amiens - Le Havre : 4 rouges
+Le Havre - Rouen : 2 noirs
+Rouen - Paris : 3 blancs
+Paris - Troyes : 7 roses / 7 jaunes
+Reims - Nancy : 5 rouges
+Reims - Troyes : 4 verts
+Thionville - Nancy : 3 orange
+Thionville - Strasbourg : 5 roses
+Nancy - Strasbourg : 4 jaunes
+Strasbourg - Mulhouse : 3 blancs
+Mulhouse - Montbéliard : 1 vert
+Montbéliard - Besançon : 2 jaunes
+Besançon - Troyes : 3 rouge / 3 vert
+Besançon - Dijon : 2 bleus
+Besançon - Annecy : 4 blancs
+Dijon - Lyon : 4 jaunes / 4 rouge
+Le Havre - Caen : 1 bleu
+Paris - Le Mans : 4 verts
+Paris - Orléans : 4 rouge / 4 bleu
+Orléans - Le Mans : 3 blancs
+Le Mans - Rennes : 5 verts
+Caen - Le Mans : 4 oranges
+Caen - Rennes : 5 blancs / 5 roses
+Rennes - Brest : 7 rouges
+Brest - Lorient : 3 orange
+Lorient - Saint-Nazaire : 3 jaunes
+Rennes - Saint-Nazaire : 3 noirs
+Rennes - Nantes : 3 bleus
+Nantes - Saint-Nazaire : 2 blancs
+Nantes - Angers : 2 rouge
+Angers - Tours : 3 bleus
+Tours - Orléans : 3 vert
+Nantes - Poitiers : 5 roses
+Tours - Poitiers : 2 blancs
+Nantes - Bordeaux : 8 noirs / 8 oranges
+Poitiers - Limoges : 3 rouges
+Limoges - Bordeaux : 5 vert / 5 bleu
+Limoges - Clermont-Ferrand : 4 blancs / 4 jaunes
+Clermont-Ferrand - Lyon : 2 oranges
+Clermont-Ferrand - Saint-Etienne : 3 rouges
+Lyon - Saint-Etienne : 1 vert
+Lyon - Grenoble : 4 bleu
+Grenoble - Annecy : 3 vert
+Saint-Etienne - Valence : 2 noirs
+Valence - Nîmes : 4 rouge / 4 jaunes
+Nîmes - Montpellier : 2 orange / 2 bleu
+Nîmes - Marseille : 1 blanc / 1 bleu
+Marseille - Toulon : 2 jaune
+Toulon - Nice : 3 vert
+Montpellier - Toulouse : 4 rouge / 4 vert
+Toulouse - Perpignan : 3 blancs
+Toulouse - Pau : 5 jaunes
+Toulouse - Bordeaux : 6 roses
+Bordeaux - Pau : 6 rouges
+Pau - Bayonne : 4 vert
+
+
+📜 Missions - Équipes de 3 joueurs (Cible : ~15 wagons)
+L'objectif est d'atteindre environ 3750m cumulés (15 x 250m).
+
+Mission Nord-Est : Dunkerque ➔ Nancy (15 wagons)
+
+Trajet : Dunkerque-Lille (2) + Lille-Valenciennes (4) + Valenciennes-Reims (2) + Reims-Nancy (5) + Nancy-Thionville (3).
+
+Mission Grand-Ouest : Caen ➔ Saint-Nazaire (15 wagons)
+
+Trajet : Caen-Le Mans (4) + Le Mans-Rennes (5) + Rennes-Saint-Nazaire (3) + Saint-Nazaire-Nantes (2) + Nantes-Angers (1... ou direct).
+
+Mission Centre-Sud : Orléans ➔ Valence (15 wagons)
+
+Trajet : Orléans-Paris (4) + Paris-Rouen (3) + Rouen-Le Havre (2) + (Variante via Lyon) : Lyon-St Etienne (1) + St Etienne-Valence (2).
+
+📜 Missions - Équipes de 4 joueurs (Cible : ~20 wagons)
+L'objectif est d'atteindre environ 5000m cumulés (20 x 250m).
+
+Mission Transversale : Brest ➔ Lyon (20 wagons)
+
+Trajet : Brest-Lorient (3) + Lorient-St Nazaire (3) + St Nazaire-Nantes (2) + Nantes-Angers (2) + Angers-Tours (3) + Tours-Orléans (3) + Orléans-Paris (4) + Paris... (ou via Limoges).
+
+Mission La Diagonale : Calais ➔ Dijon (20 wagons)
+
+Trajet : Calais-Dunkerque (1) + Dunkerque-Béthune (3) + Béthune-Douai (1) + Douai-Amiens (2) + Amiens-Paris (3) + Paris-Troyes (7) + Troyes-Besançon (3) + Besançon-Dijon (2).
+
+Mission Atlantique-Méditerranée : Bordeaux ➔ Nice (20 wagons)
+
+Trajet : Bordeaux-Toulouse (6) + Toulouse-Montpellier (4) + Montpellier-Nîmes (2) + Nîmes-Marseille (1) + Marseille-Toulon (2) + Toulon-Nice (3).
+
+📜 Missions - Équipes de 5 joueurs (Cible : ~24 wagons)
+L'objectif est d'atteindre environ 6000m cumulés (24 x 250m).
+
+Mission Le Grand Tour : Strasbourg ➔ Perpignan (24 wagons)
+
+Trajet : Strasbourg-Mulhouse (3) + Mulhouse-Montbéliard (1) + Montbéliard-Besançon (2) + Besançon-Dijon (2) + Dijon-Lyon (4) + Lyon-Valence (via St Etienne 1+2) + Valence-Nîmes (4) + Nîmes-Montpellier (2) + Montpellier-Toulouse (4) + Toulouse-Perpignan (3).
+
+Mission Bretagne-Alsace : Brest ➔ Strasbourg (25 wagons)
+
+Trajet : Brest-Rennes (7) + Rennes-Le Mans (5) + Le Mans-Paris (4) + Paris-Troyes (7) + Troyes-Besançon (3) + Besançon-Dijon (2) ... ou via Reims/Nancy.

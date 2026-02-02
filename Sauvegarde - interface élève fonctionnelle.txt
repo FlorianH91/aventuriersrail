@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aventuriers du Rail - EPS Pro</title>
+    <style>
+        :root { --p: #2c3e50; --s: #27ae60; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        #app { display: flex; height: 100%; }
+        
+        #sidebar { width: 340px; background: white; border-right: 2px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+        .padding { padding: 15px; }
+        
+        #map-area { flex-grow: 1; background: #cbdceb; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; }
+        #map-container { transform-origin: top center; transition: transform 0.3s ease; }
+        embed { width: 1000px; height: 960px; pointer-events: none; }
+        
+        .controls-map { position: absolute; top: 10px; right: 10px; z-index: 20; display: flex; gap: 5px; }
+        .btn-zoom { background: rgba(0,0,0,0.6); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
+        .player-row { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 5px; cursor: pointer; border: 1px solid #eee; }
+        .inventory { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+        .wagon-pill { padding: 4px 8px; border-radius: 4px; font-weight: bold; border: 1px solid #333; font-size: 0.8rem; }
+        
+        select, input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+        button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-build { background: var(--s); }
+        
+        /* Correction Couleurs et Contraste texte */
+        .jaune { background: #FFD700; color: #000; } /* Texte Noir sur Jaune */
+        .blanc { background: #fff; color: #000; border: 1px solid #ccc; } /* Texte Noir sur Blanc */
+        .orange { background: #FF8C00; color: white; }
+        .rose { background: #FF69B4; color: white; } 
+        .noire { background: #222; color: white; }
+        .vert { background: #2E7D32; color: white; } 
+        .bleu { background: #1E90FF; color: white; }
+        .rouge { background: #DC143C; color: white; }
+
+        .log-item { font-size: 0.85rem; padding: 4px; border-bottom: 1px solid #eee; color: #555; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 100; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="sidebar">
+        <div id="screen-setup" class="padding">
+            <h2>🚂 Configuration</h2>
+            <input type="text" id="names-input" placeholder="Prénoms (ex: Tom, Léa...)">
+            <button onclick="startGame()">Commencer la séance</button>
+        </div>
+
+        <div id="screen-game" class="screen padding" style="display:none">
+            <div class="card" style="background: var(--p); color: white;">
+                <strong>📍 MISSION :</strong> <span id="m-title"></span>
+            </div>
+            <div id="players-list"></div>
+            <div id="inventory-zone" class="inventory"></div>
+            <div class="card">
+                <h3>🛤 Acheter un rail</h3>
+                <select id="sel-a"></select> vers <select id="sel-b"></select>
+                <button class="btn-build" onclick="buildRoute()">Valider le trajet</button>
+            </div>
+            <div class="card" style="border-left-color: #95a5a6;">
+                <strong>📜 Journal des trajets :</strong>
+                <div id="history-log" style="margin-top:8px; max-height: 150px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-area">
+        <div class="controls-map">
+            <button class="btn-zoom" onclick="zoomMap(0.1)">+</button>
+            <button class="btn-zoom" onclick="zoomMap(-0.1)">-</button>
+            <button class="btn-zoom" onclick="fitMap()">Ajuster la vue</button>
+        </div>
+        <div id="map-container">
+            <embed id="map-svg" src="carte.svg" type="image/svg+xml">
+        </div>
+    </div>
+</div>
+
+<div id="modal-chance" class="modal"><div class="modal-content"><h2>Tour terminé !</h2><p>Choisis un wagon parmi ces 4 :</p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
+<div id="modal-win" class="modal"><div class="modal-content" style="background:gold"><h1>🏆 VICTOIRE !</h1><p>Mission accomplie.</p><button onclick="location.reload()" style="background:black">Nouvelle Équipe</button></div></div>
+
+<script>
+// --- DONNÉES MISSIONS RECALIBRÉES ---
+const MISSIONS = {
+    3: [
+        {s:"Brest", e:"Orléans"}, {s:"Dunkerque", e:"Troyes"}, {s:"Caen", e:"Poitiers"}
+    ],
+    4: [
+        {s:"Calais", e:"Strasbourg"}, {s:"Nice", e:"Bordeaux"}, {s:"Lorient", e:"Dijon"}
+    ],
+    5: [
+        {s:"Bayonne", e:"Strasbourg"}, {s:"Brest", e:"Nice"}
+    ]
+};
+
+// --- DONNÉES RAILS (IDENTIQUES) ---
+const RAIL_DATA = [
+    {u:"Calais", v:"Dunkerque", cost:1, col:["jaune"]}, {u:"Dunkerque", v:"Lille", cost:2, col:["bleu"]},
+    {u:"Dunkerque", v:"Béthune", cost:3, col:["rouge"]}, {u:"Béthune", v:"Douai", cost:1, col:["blanc"]},
+    {u:"Douai", v:"Amiens", cost:2, col:["bleu"]}, {u:"Douai", v:"Valenciennes", cost:2, col:["noire"]},
+    {u:"Lille", v:"Valenciennes", cost:4, col:["orange"]}, {u:"Valenciennes", v:"Thionville", cost:5, col:["noire","rose"]},
+    {u:"Valenciennes", v:"Reims", cost:2, col:["jaune"]}, {u:"Amiens", v:"Paris", cost:3, col:["orange","vert"]},
+    {u:"Amiens", v:"Le Havre", cost:4, col:["rouge"]}, {u:"Le Havre", v:"Rouen", cost:2, col:["noire"]},
+    {u:"Rouen", v:"Paris", cost:3, col:["blanc"]}, {u:"Paris", v:"Troyes", cost:7, col:["rose","jaune"]},
+    {u:"Reims", v:"Nancy", cost:5, col:["rouge"]}, {u:"Reims", v:"Troyes", cost:4, col:["vert"]},
+    {u:"Thionville", v:"Nancy", cost:3, col:["orange"]}, {u:"Thionville", v:"Strasbourg", cost:5, col:["rose"]},
+    {u:"Nancy", v:"Strasbourg", cost:4, col:["jaune"]}, {u:"Strasbourg", v:"Mulhouse", cost:3, col:["blanc"]},
+    {u:"Mulhouse", v:"Montbéliard", cost:1, col:["vert"]}, {u:"Montbéliard", v:"Besançon", cost:2, col:["jaune"]},
+    {u:"Besançon", v:"Troyes", cost:3, col:["rouge","vert"]}, {u:"Besançon", v:"Dijon", cost:2, col:["bleu"]},
+    {u:"Besançon", v:"Annecy", cost:4, col:["blanc"]}, {u:"Dijon", v:"Lyon", cost:4, col:["jaune","rouge"]},
+    {u:"Le Havre", v:"Caen", cost:1, col:["bleu"]}, {u:"Paris", v:"Le Mans", cost:4, col:["vert"]},
+    {u:"Paris", v:"Orléans", cost:4, col:["rouge","bleu"]}, {u:"Orléans", v:"Le Mans", cost:3, col:["blanc"]},
+    {u:"Le Mans", v:"Rennes", cost:5, col:["vert"]}, {u:"Caen", v:"Le Mans", cost:4, col:["orange"]},
+    {u:"Caen", v:"Rennes", cost:5, col:["blanc","rose"]}, {u:"Rennes", v:"Brest", cost:7, col:["rouge"]},
+    {u:"Brest", v:"Lorient", cost:3, col:["orange"]}, {u:"Lorient", v:"Saint-Nazaire", cost:3, col:["jaune"]},
+    {u:"Rennes", v:"Saint-Nazaire", cost:3, col:["noire"]}, {u:"Rennes", v:"Nantes", cost:3, col:["bleu"]},
+    {u:"Nantes", v:"Saint-Nazaire", cost:2, col:["blanc"]}, {u:"Nantes", v:"Angers", cost:2, col:["rouge"]},
+    {u:"Angers", v:"Tours", cost:3, col:["bleu"]}, {u:"Tours", v:"Orléans", cost:3, col:["vert"]},
+    {u:"Nantes", v:"Poitiers", cost:5, col:["rose"]}, {u:"Tours", v:"Poitiers", cost:2, col:["blanc"]},
+    {u:"Nantes", v:"Bordeaux", cost:8, col:["noire","orange"]}, {u:"Poitiers", v:"Limoges", cost:3, col:["rouge"]},
+    {u:"Limoges", v:"Bordeaux", cost:5, col:["vert","bleu"]}, {u:"Limoges", v:"Clermont-Ferrand", cost:4, col:["blanc","jaune"]},
+    {u:"Clermont-Ferrand", v:"Lyon", cost:2, col:["orange"]}, {u:"Clermont-Ferrand", v:"Saint-Etienne", cost:3, col:["rouge"]},
+    {u:"Lyon", v:"Saint-Etienne", cost:1, col:["vert"]}, {u:"Lyon", v:"Grenoble", cost:4, col:["bleu"]},
+    {u:"Grenoble", v:"Annecy", cost:3, col:["vert"]}, {u:"Saint-Etienne", v:"Valence", cost:2, col:["noire"]},
+    {u:"Valence", v:"Nîmes", cost:4, col:["rouge","jaune"]}, {u:"Nîmes", v:"Montpellier", cost:2, col:["orange","bleu"]},
+    {u:"Nîmes", v:"Marseille", cost:1, col:["blanc","bleu"]}, {u:"Marseille", v:"Toulon", cost:2, col:["jaune"]},
+    {u:"Toulon", v:"Nice", cost:3, col:["vert"]}, {u:"Montpellier", v:"Toulouse", cost:4, col:["rouge","vert"]},
+    {u:"Toulouse", v:"Perpignan", cost:3, col:["blanc"]}, {u:"Toulouse", v:"Pau", cost:5, col:["jaune"]},
+    {u:"Toulouse", v:"Bordeaux", cost:6, col:["rose"]}, {u:"Bordeaux", v:"Pau", cost:6, col:["rouge"]},
+    {u:"Pau", v:"Bayonne", cost:4, col:["vert"]}
+];
+
+let state = { scale: 1, players:[], inv:{jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, mission:null, built:[] };
+
+function startGame() {
+    const n = document.getElementById('names-input').value; if(!n) return;
+    state.players = n.split(',').map(name => ({name:name.trim(), d:0}));
+    const pool = MISSIONS[state.players.length] || MISSIONS[3];
+    state.mission = pool[Math.floor(Math.random()*pool.length)];
+    const sa = document.getElementById('sel-a'), sb = document.getElementById('sel-b');
+    const cities = [...new Set(RAIL_DATA.flatMap(r=>[r.u,r.v]))].sort();
+    cities.forEach(c => { sa.add(new Option(c,c)); sb.add(new Option(c,c)); });
+    document.getElementById('m-title').innerText = state.mission.s + " ➔ " + state.mission.e;
+    document.getElementById('screen-setup').style.display='none';
+    document.getElementById('screen-game').style.display='block';
+    setTimeout(fitMap, 100); updateUI();
+}
+
+function addLap(i) {
+    state.players[i].d += 250;
+    const modal = document.getElementById('modal-chance'), cont = document.getElementById('chance-buttons');
+    cont.innerHTML = "";
+    // MODIFICATION : On propose 4 couleurs au lieu de 3
+    const pick = Object.keys(state.inv).sort(()=>0.5-Math.random()).slice(0,4);
+    pick.forEach(c => {
+        const b = document.createElement('button'); b.className = `wagon-pill ${c}`; b.innerText = c.toUpperCase(); b.style.width="auto";
+        b.onclick = () => { state.inv[c]++; modal.style.display="none"; updateUI(); };
+        cont.appendChild(b);
+    });
+    modal.style.display = "flex";
+}
+
+function buildRoute() {
+    const a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
+    if(a === b) return alert("Sélectionnez deux villes différentes.");
+    const exists = state.built.find(r => (r.u==a && r.v==b) || (r.v==a && r.u==b));
+    if(exists) return alert("Trajet déjà effectué !");
+    const rail = RAIL_DATA.find(r => (r.u==a && r.v==b) || (r.u==b && r.v==a));
+    if(!rail) return alert("Trajet direct inconnu !");
+    
+    let color = rail.col[0];
+    if(rail.col.length > 1) {
+        color = prompt(`Trajet à ${rail.cost} wagons. Quelle couleur utilisez-vous ? (${rail.col.join(' ou ')})`).toLowerCase();
+        if(!rail.col.includes(color)) return alert("Couleur non valide.");
+    }
+    if(state.inv[color] >= rail.cost) {
+        state.inv[color] -= rail.cost;
+        state.built.push({u:a, v:b, c:color, cost:rail.cost});
+        addLog(a, b, rail.cost, color);
+        updateUI(); checkWin();
+    } else alert(`Pas assez de wagons ${color} !`);
+}
+
+function addLog(a, b, n, col) {
+    const log = document.getElementById('history-log');
+    const div = document.createElement('div');
+    div.className = "log-item";
+    div.innerHTML = `🛤️ <b>${a} - ${b}</b> (${n} <span style="color:${getColorCode(col)}; background:#eee; padding:0 4px; border-radius:2px;">■</span>)`;
+    log.prepend(div);
+}
+
+function getColorCode(c) {
+    const codes = {jaune:'#FFD700', orange:'#FF8C00', rose:'#FF69B4', noire:'#222', vert:'#2E7D32', bleu:'#1E90FF', rouge:'#DC143C', blanc:'#ccc'};
+    return codes[c];
+}
+
+function checkWin() {
+    let visited = new Set(), q = [state.mission.s];
+    while(q.length > 0) {
+        let curr = q.shift(); if(curr == state.mission.e) return document.getElementById('modal-win').style.display='flex';
+        visited.add(curr);
+        state.built.forEach(r => { 
+            if(r.u==curr && !visited.has(r.v)) q.push(r.v); 
+            if(r.v==curr && !visited.has(r.u)) q.push(r.u); 
+        });
+    }
+}
+
+function updateUI() {
+    const pl = document.getElementById('players-list'); pl.innerHTML = "<h3>Coureurs (+250m)</h3>";
+    state.players.forEach((p, i) => {
+        pl.innerHTML += `<div class="player-row" onclick="addLap(${i})"><span>${p.name}</span><b>${p.d}m</b></div>`;
+    });
+    const iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
+    for(let c in state.inv) if(state.inv[c]>0) iz.innerHTML += `<div class="wagon-pill ${c}">${state.inv[c]}</div>`;
+}
+
+function zoomMap(val) { state.scale += val; applyZoom(); }
+function fitMap() {
+    const area = document.getElementById('map-area');
+    state.scale = area.clientWidth / 1000;
+    applyZoom();
+}
+function applyZoom() { document.getElementById('map-container').style.transform = `scale(${state.scale})`; }
+</script>
+</body>
+</html>
