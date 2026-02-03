@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aventuriers du Rail-Fond - VERSION WAGONS</title>
+    <title>Aventuriers du Rail-Fond</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
@@ -23,7 +23,7 @@
         }
         .card-menu:hover { transform: scale(1.05); border-color: #00d2ff; }
 
-        #app { display: none; height: 100%; }
+        #app { display: none; height: 100%; width: 100%; flex-direction: row; }
         #sidebar { width: 340px; background: white; border-right: 2px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
         .padding { padding: 15px; }
         
@@ -31,8 +31,10 @@
         #map-container { transform-origin: top center; transition: transform 0.3s ease; }
         embed { width: 1000px; height: 960px; pointer-events: none; }
         
-        .controls-map { position: absolute; top: 10px; right: 10px; z-index: 20; display: flex; gap: 5px; }
-        .btn-zoom { background: rgba(0,0,0,0.6); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
+        /* Boutons repositionnés en bas pour éviter la barre URL mobile */
+        .controls-map { position: absolute; bottom: 20px; right: 20px; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
+        .btn-zoom { background: #2c3e50; color: white; border: 2px solid white; width: 50px; height: 50px; border-radius: 8px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+        .btn-fit { width: 80px; font-size: 0.8rem; align-self: flex-end; }
 
         .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
         .player-row { display: flex; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 6px; margin-bottom: 5px; cursor: pointer; border: 1px solid #eee; font-weight: bold; }
@@ -64,6 +66,12 @@
 
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; color: #333; }
+        
+        /* Fix mobile sidebar */
+        @media (max-width: 768px) {
+            #app { flex-direction: column; }
+            #sidebar { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #ddd; }
+        }
     </style>
 </head>
 <body>
@@ -82,19 +90,19 @@
             <button onclick="location.reload()" style="background:#7f8c8d; margin-bottom:20px;">← Retour</button>
             <h2>🚂 Configuration</h2>
             <div id="names-container">
-                <input type="text" class="input-names" placeholder="Prénom coureur 1">
-                <input type="text" class="input-names" placeholder="Prénom coureur 2">
-                <input type="text" class="input-names" placeholder="Prénom coureur 3">
-                <input type="text" class="input-names" placeholder="Prénom coureur 4">
-                <input type="text" class="input-names" placeholder="Prénom coureur 5">
+                <input type="text" class="input-names" placeholder="Prénom 1">
+                <input type="text" class="input-names" placeholder="Prénom 2">
+                <input type="text" class="input-names" placeholder="Prénom 3">
+                <input type="text" class="input-names" placeholder="Prénom 4">
+                <input type="text" class="input-names" placeholder="Prénom 5">
             </div>
             <select id="team-color">
-                <option value="rouge">🔴 Chasuble Rouge</option>
-                <option value="bleu">🔵 Chasuble Bleue</option>
-                <option value="vert">🟢 Chasuble Verte</option>
-                <option value="jaune">🟡 Chasuble Jaune</option>
+                <option value="rouge">🔴 Rouge</option>
+                <option value="bleu">🔵 Bleue</option>
+                <option value="vert">🟢 Verte</option>
+                <option value="jaune">🟡 Jaune</option>
             </select>
-            <button onclick="startGame()" style="background:var(--s); margin-top:15px;">Commencer la séance</button>
+            <button onclick="startGame()" style="background:var(--s); margin-top:15px;">Commencer</button>
         </div>
 
         <div id="screen-game" class="padding" style="display:none">
@@ -114,41 +122,41 @@
             </div>
         </div>
 
-        <div id="screen-prof" class="padding" style="display:none; width: 100%;">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <button onclick="location.reload()" style="width:auto; background:#7f8c8d;">← Retour</button>
-                <button onclick="confirmReset()" class="btn-reset" style="width:auto; margin:0;">Remise à 0</button>
+        <div id="screen-prof" class="padding" style="display:none;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="location.reload()" style="background:#7f8c8d;">← Retour</button>
+                <button onclick="confirmReset()" class="btn-reset" style="margin:0;">R.A.Z</button>
             </div>
-            
             <div class="collective-goal" style="margin-top:15px;">
                 <div style="display:flex; justify-content:space-between">
-                    <b>Objectif Classe : 10 000m</b>
+                    <b>Objectif : 10 000m</b>
                     <b id="collective-total">0 m</b>
                 </div>
                 <div class="progress-container"><div id="collective-bar" class="progress-bar"></div></div>
             </div>
-            <h3>🔔 En attente :</h3>
             <div id="prof-pending"></div>
-            <h3 style="margin-top:20px;">📊 État des Missions :</h3>
             <div id="prof-teams"></div>
         </div>
     </div>
 
     <div id="map-area">
         <div class="controls-map">
-            <button class="btn-zoom" onclick="zoomMap(0.1)">+</button>
-            <button class="btn-zoom" onclick="zoomMap(-0.1)">-</button>
-            <button class="btn-zoom" onclick="fitMap()">Ajuster</button>
+            <button class="btn-zoom" onclick="zoomMap(0.2)">+</button>
+            <button class="btn-zoom" onclick="zoomMap(-0.2)">-</button>
+            <button class="btn-zoom btn-fit" onclick="fitMap()">AJUSTER</button>
         </div>
-        <div id="map-container"><embed id="svg-embed" src="carte.svg" type="image/svg+xml"></div>
+        <div id="map-container">
+            <embed id="svg-embed" src="carte.svg" type="image/svg+xml">
+        </div>
     </div>
 </div>
 
-<div id="modal-wait" class="modal"><div class="modal-content"><h2>⌛ Validation...</h2><p>Le professeur valide ton tour de 250m.</p></div></div>
+<div id="modal-wait" class="modal"><div class="modal-content"><h2>⌛ Validation...</h2><p>Le professeur valide ton tour.</p></div></div>
 <div id="modal-chance" class="modal"><div class="modal-content"><h2>Bravo !</h2><p>Choisis un wagon :</p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
-<div id="modal-win" class="modal"><div class="modal-content" style="background:gold"><h1>🏆 VICTOIRE !</h1><p>Mission accomplie.</p><button onclick="location.reload()" style="background:black">Terminer</button></div></div>
+<div id="modal-win" class="modal"><div class="modal-content" style="background:gold"><h1>🏆 VICTOIRE !</h1><button onclick="location.reload()">Terminer</button></div></div>
 
 <script>
+// --- CONFIG FIREBASE ---
 const firebaseConfig = {
     apiKey: "AIzaSyAZgcf2PQ6DfOs3GYW0_ZC5xr09Bhku604",
     authDomain: "les-aventuriers-du-rail-b1965.firebaseapp.com",
@@ -161,35 +169,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- EDITE TES MISSIONS ICI ---
-// target = Nombre total de wagons (segments) à poser pour finir
-const MISSIONS_3 = [
-    {s:"Calais", e:"Troyes", target:13},
-    {s:"Nancy", e:"Grenoble", target:12},
-    {s:"Caen", e:"Poitiers", target:12},
-{s:"Nice", e:"Toulouse", target:12},
-{s:"Paris", e:"Limoges", target:11},
-{s:"Brest", e:"Tours", target:13},
-{s:"Bordeaux", e:"Orléans", target:12},
-{s:"Caen", e:"Poitiers", target:12},
-{s:"Montbéliard", e:"Paris", target:12},
-{s:"Lyon", e:"Strasbourg", target:12}
-];
-
-const MISSIONS_4 = [
-    {s:"Calais", e:"Strasbourg", target:17},
-    {s:"Nice", e:"Bordeaux", target:22},
-    {s:"Lorient", e:"Dijon", target:18}
-];
-
-const MISSIONS_5 = [
-    {s:"Bayonne", e:"Strasbourg", target:25},
-    {s:"Brest", e:"Nice", target:28},
-    {s:"Dunkerque", e:"Perpignan", target:24}
-];
-
-
-// ------------------------------
+const MISSIONS_3 = [{s:"Calais", e:"Troyes", target:13},{s:"Nancy", e:"Grenoble", target:12},{s:"Caen", e:"Poitiers", target:12}];
+const MISSIONS_4 = [{s:"Calais", e:"Strasbourg", target:17},{s:"Nice", e:"Bordeaux", target:22},{s:"Lorient", e:"Dijon", target:18}];
+const MISSIONS_5 = [{s:"Bayonne", e:"Strasbourg", target:25},{s:"Brest", e:"Nice", target:28},{s:"Dunkerque", e:"Perpignan", target:24}];
 
 const RAIL_DATA = [
     {u:"Calais", v:"Dunkerque", cost:1, col:["jaune"]}, {u:"Dunkerque", v:"Lille", cost:2, col:["bleu"]},
@@ -232,10 +214,7 @@ let state = { scale: 1, teamId: null, color: null, mission: null, built: [], cur
 
 function openApp(role) {
     if(role === 'prof') {
-        const password = "EPS"; 
-        const entry = prompt("Entrez le code d'accès Professeur :");
-        if (entry !== password) { alert("Code incorrect !"); return; }
-        
+        if (prompt("Code Prof :") !== "EPS") return;
         document.getElementById('screen-home').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
         document.getElementById('screen-setup').style.display = 'none';
@@ -246,49 +225,30 @@ function openApp(role) {
     } else {
         document.getElementById('screen-home').style.display = 'none';
         document.getElementById('app').style.display = 'flex';
-        document.getElementById('screen-setup').style.display = 'block';
     }
 }
 
 function startGame() {
-    const inputs = document.querySelectorAll('.input-names');
-    const names = [];
-    inputs.forEach(i => { if(i.value.trim() !== "") names.push(i.value.trim()); });
-
+    const names = Array.from(document.querySelectorAll('.input-names')).map(i=>i.value.trim()).filter(n=>n!=="");
+    if(names.length < 1) return alert("Prénom !");
     state.color = document.getElementById('team-color').value;
-    if(names.length < 1) return alert("Indiquez au moins un prénom !");
-    
     state.teamId = state.color + "_" + Date.now();
-    const ind = {}; names.forEach(n => ind[n] = 0);
-    
-    // Sélection de la liste selon le nombre exact de joueurs
-    let pool;
-    if (names.length >= 5) {
-        pool = MISSIONS_5;
-    } else if (names.length === 4) {
-        pool = MISSIONS_4;
-    } else {
-        pool = MISSIONS_3;
-    }
-    
+    let pool = (names.length >= 5) ? MISSIONS_5 : (names.length === 4 ? MISSIONS_4 : MISSIONS_3);
     state.mission = pool[Math.floor(Math.random()*pool.length)];
-    
+    const ind = {}; names.forEach(n => ind[n] = 0);
     db.ref('teams/' + state.teamId).set({
         color: state.color, names: names.join(', '), distance: 0, 
         mission: state.mission, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0},
         individual: ind, routes: []
     });
-
     const sa = document.getElementById('sel-a'), sb = document.getElementById('sel-b');
     const cities = [...new Set(RAIL_DATA.flatMap(r=>[r.u,r.v]))].sort();
     cities.forEach(c => { sa.add(new Option(c,c)); sb.add(new Option(c,c)); });
-
     document.getElementById('m-title').innerText = state.mission.s + " ➔ " + state.mission.e;
     document.getElementById('screen-setup').style.display = 'none';
     document.getElementById('screen-game').style.display = 'block';
     listenTeam();
 }
-
 
 function askValidation(name) {
     state.currentPlayer = name;
@@ -307,10 +267,8 @@ function listenTeam() {
         const data = snap.val(); if(!data) return;
         state.built = data.routes ? Object.values(data.routes) : [];
         document.getElementById('dist-team').innerText = data.distance + " m";
-        const pl = document.getElementById('players-list'); pl.innerHTML = "<h3>Coureurs (+250m)</h3>";
-        for(let p in data.individual) {
-            pl.innerHTML += `<div class="player-row" onclick="askValidation('${p}')"><span>${p}</span><b>${data.individual[p]}m</b></div>`;
-        }
+        const pl = document.getElementById('players-list'); pl.innerHTML = "<h3>Coureurs</h3>";
+        for(let p in data.individual) pl.innerHTML += `<div class="player-row" onclick="askValidation('${p}')"><span>${p}</span><b>${data.individual[p]}m</b></div>`;
         const iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
         for(let c in data.inv) if(data.inv[c]>0) iz.innerHTML += `<div class="wagon-pill ${c}">${data.inv[c]}</div>`;
         checkWin(data.mission);
@@ -337,16 +295,12 @@ function showChanceModal() {
 function buildRoute() {
     const a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
     const rail = RAIL_DATA.find(r => (r.u==a && r.v==b) || (r.u==b && r.v==a));
-    if(!rail) return alert("Pas de liaison !");
-    
-    let color = rail.col[0];
-    if(rail.col.length > 1) color = prompt(`Couleur ? (${rail.col.join('/')})`).toLowerCase();
-    
+    if(!rail) return alert("Liaison impossible");
+    let color = rail.col.length > 1 ? prompt(`Couleur (${rail.col.join('/')}) ?`).toLowerCase() : rail.col[0];
     db.ref('teams/' + state.teamId).once('value', snap => {
         const d = snap.val();
         if(d.inv[color] >= rail.cost) {
             db.ref('teams/' + state.teamId + '/inv/' + color).transaction(n => n - rail.cost);
-            // On enregistre aussi le coût pour le calcul de progression
             db.ref('teams/' + state.teamId + '/routes').push({u:a, v:b, cost: rail.cost});
             alert("Rail posé !");
         } else alert("Pas assez de wagons !");
@@ -355,41 +309,31 @@ function buildRoute() {
 
 function listenProf() {
     db.ref('pending').on('value', snap => {
-        const div = document.getElementById('prof-pending'); div.innerHTML = "";
+        const div = document.getElementById('prof-pending'); div.innerHTML = "<h3>En attente</h3>";
         snap.forEach(child => {
             const d = child.val();
             div.innerHTML += `<div class="prof-card" style="display:flex; justify-content:space-between; align-items:center;">
-                <b>${d.playerName} (Team ${d.color.toUpperCase()})</b>
-                <button onclick="db.ref('pending/${d.teamId}').remove()" style="width:auto; background:var(--s); padding:10px 20px;">VALIDER</button>
+                <b>${d.playerName} (Team ${d.color})</b>
+                <button onclick="db.ref('pending/${d.teamId}').remove()" style="width:auto; background:var(--s);">VALIDER</button>
             </div>`;
         });
     });
-
     db.ref('teams').on('value', snap => {
-        const div = document.getElementById('prof-teams'); div.innerHTML = "";
-        let totalClasse = 0;
+        const div = document.getElementById('prof-teams'); div.innerHTML = "<h3>Équipes</h3>";
+        let totalC = 0;
         snap.forEach(child => {
-            const t = child.val();
-            totalClasse += t.distance;
-            const routesArr = t.routes ? Object.values(t.routes) : [];
-            
-            // Calcul de progression basé sur le COÛT TOTAL des wagons posés
-            const totalWagonsPoses = routesArr.reduce((sum, r) => sum + (r.cost || 0), 0);
-            const progress = Math.min((totalWagonsPoses / (t.mission.target || 15)) * 100, 100);
-            
-            let trajetStr = routesArr.map(r => `${r.u}-${r.v}`).join(', ');
-            let indRes = "";
-            for(let p in t.individual) indRes += `${p}: ${t.individual[p]}m | `;
-
-            div.innerHTML += `<div class="prof-card" style="border-color:${t.color === 'jaune' ? 'gold' : t.color}">
-                <div style="display:flex; justify-content:space-between;"><b>TEAM ${t.color.toUpperCase()}</b> <b>${t.distance}m</b></div>
-                <div class="progress-container"><div class="progress-bar" style="width:${progress}%"></div><div class="progress-text">Progression : ${totalWagonsPoses} / ${t.mission.target} wagons</div></div>
-                <div class="trajets-list">Historique : ${trajetStr || 'Aucun rail'}</div>
-                <div style="font-size:0.7rem; color:#666; margin-top:5px;">Individuel : ${indRes}</div>
+            const t = child.val(); totalC += t.distance;
+            const rArr = t.routes ? Object.values(t.routes) : [];
+            const wPoses = rArr.reduce((s, r) => s + (r.cost || 0), 0);
+            const progress = Math.min((wPoses / (t.mission.target || 15)) * 100, 100);
+            div.innerHTML += `<div class="prof-card" style="border-left-color:${t.color}">
+                <b>TEAM ${t.color.toUpperCase()} - ${t.distance}m</b>
+                <div class="progress-container"><div class="progress-bar" style="width:${progress}%"></div></div>
+                <small>${wPoses} / ${t.mission.target} wagons</small>
             </div>`;
         });
-        document.getElementById('collective-total').innerText = totalClasse + " m";
-        document.getElementById('collective-bar').style.width = Math.min((totalClasse/10000)*100, 100) + "%";
+        document.getElementById('collective-total').innerText = totalC + " m";
+        document.getElementById('collective-bar').style.width = Math.min((totalC/10000)*100, 100) + "%";
     });
 }
 
@@ -406,14 +350,8 @@ function checkWin(mission) {
     }
 }
 
-function confirmReset() {
-    if(confirm("⚠️ VOULEZ-VOUS TOUT RÉINITIALISER ?")) {
-        db.ref('teams').remove();
-        db.ref('pending').remove();
-    }
-}
-
-function zoomMap(val) { state.scale += val; applyZoom(); }
+function confirmReset() { if(confirm("R.A.Z ?")) { db.ref('teams').remove(); db.ref('pending').remove(); } }
+function zoomMap(v) { state.scale += v; applyZoom(); }
 function fitMap() { state.scale = document.getElementById('map-area').clientWidth / 1000; applyZoom(); }
 function applyZoom() { document.getElementById('map-container').style.transform = `scale(${state.scale})`; }
 </script>
