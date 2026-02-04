@@ -60,6 +60,7 @@
 let html5QrCode = null;
 let donneesScan = null;
 let scores = {};
+let idsValides = new Set(); // Mémorise les IDs de course uniques
 
 function ouvrirScanner() {
     donneesScan = null;
@@ -74,7 +75,15 @@ function ouvrirScanner() {
         { fps: 10, qrbox: 250 },
         (text) => {
             try {
-                donneesScan = JSON.parse(text);
+                let temp = JSON.parse(text);
+                
+                // DÉTECTION DES DOUBLONS
+                if (temp.id && idsValides.has(temp.id)) {
+                    alert("⚠️ SCAN REFUSÉ : Ce trajet a déjà été validé !");
+                    return; 
+                }
+
+                donneesScan = temp;
                 
                 // ACTION : On bascule les fenêtres immédiatement
                 document.getElementById("modale-scan").style.display = "none";
@@ -97,6 +106,11 @@ function validerScore() {
     if (!donneesScan || !donneesScan.player) {
         document.getElementById("modale-validation").style.display = "none";
         return;
+    }
+
+    // Enregistrement de l'ID pour bloquer le prochain scan identique
+    if (donneesScan.id) {
+        idsValides.add(donneesScan.id);
     }
 
     const nom = donneesScan.player;

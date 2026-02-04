@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Élève - Rail-Fond V1.3</title>
+    <title>Élève - Rail-Fond V1.4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --p: #2c3e50; --s: #27ae60; }
@@ -27,12 +27,11 @@
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: white; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; }
         
-        /* Couleurs UI & Wagons */
         .jaune { background: #FFD700; color: #000; } 
         .blanc { background: #fff; color: #000; border: 2px solid #333; } 
         .orange { background: #FF8C00; color: white; } 
-        .rose { background: #FF69B4; color: white; } /* Couleur des rails */
-        .violet { background: #8A2BE2; color: white; } /* Couleur d'équipe uniquement */
+        .rose { background: #FF69B4; color: white; } 
+        .violet { background: #8A2BE2; color: white; } 
         .noire { background: #222; color: white; } 
         .vert { background: #2E7D32; color: white; } 
         .bleu { background: #1E90FF; color: white; } 
@@ -47,7 +46,7 @@
 <div id="app">
     <div id="sidebar">
         <div id="screen-setup" class="padding">
-            <h2>🚂 Rail-Fond V1.3</h2>
+            <h2>🚂 Rail-Fond V1.4</h2>
             <div id="names-inputs">
                 <input type="text" class="input-names" placeholder="Prénom 1">
                 <input type="text" class="input-names" placeholder="Prénom 2">
@@ -98,6 +97,7 @@
     <div class="modal-content">
         <h2 id="qr-title">Scan Prof</h2>
         <div id="qrcode" style="display:flex; justify-content:center; margin:20px;"></div>
+        <p style="margin-top:10px; color:#666; font-size:0.8rem;">ID Course : <span id="display-id"></span></p>
         <p>Code PIN :</p>
         <input type="number" id="input-pin" placeholder="---" style="font-size: 2rem; text-align: center;">
         <button onclick="checkPin()" style="background:var(--s); margin-top:15px;">CONFIRMER</button>
@@ -106,8 +106,8 @@
 
 <div id="modal-chance" class="modal">
     <div class="modal-content">
-        <h2>Récompense !</h2>
-        <p>Choisis un wagon :</p>
+        <h2>Bravo !</h2>
+        <p>Choisis ton wagon de récompense :</p>
         <div id="chance-buttons" class="inventory" style="justify-content:center"></div>
     </div>
 </div>
@@ -115,7 +115,7 @@
 <div id="modal-win" class="modal">
     <div class="modal-content" style="background:gold">
         <h1>🏆 VICTOIRE !</h1>
-        <p>Villes reliées avec succès !</p>
+        <p>Villes reliées ! Mission accomplie.</p>
         <button onclick="location.reload()">Rejouer</button>
     </div>
 </div>
@@ -129,7 +129,7 @@ const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque
 
 let state = { scale: 1, color: null, mission: null, built: [], currentPlayer: null, currentPin: null, distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {} };
 
-function clean(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+function clean(str) { return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 
 function startGame() {
     const names = Array.from(document.querySelectorAll('.input-names')).map(i=>i.value.trim()).filter(n=>n!=="");
@@ -169,7 +169,19 @@ function updateUI() {
 function askValidation(name) {
     state.currentPlayer = name;
     state.currentPin = Math.floor(100 + Math.random() * 899);
-    const data = { team: state.color, player: name, dist: state.distance + 250, pin: state.currentPin };
+    
+    // SÉCURITÉ : ID Unique pour empêcher le double scan du même code
+    const runId = clean(name) + "_" + Date.now(); 
+    document.getElementById('display-id').innerText = runId;
+
+    const data = { 
+        team: state.color, 
+        player: name, 
+        dist: state.distance + 250, 
+        pin: state.currentPin,
+        id: runId // ID envoyé au prof
+    };
+
     document.getElementById('qrcode').innerHTML = "";
     new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
     document.getElementById('qr-title').innerText = "Validation : " + name;
