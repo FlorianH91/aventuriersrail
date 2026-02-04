@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Élève - Rail-Fond</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --p: #2c3e50; --s: #27ae60; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        #app { display: flex; height: 100%; width: 100%; }
+        #sidebar { width: 340px; background: white; border-right: 2px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+        .padding { padding: 15px; }
+        #map-area { flex-grow: 1; background: #cbdceb; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; }
+        #map-container { transform-origin: top center; transition: transform 0.3s ease; }
+        embed { width: 1000px; height: 960px; pointer-events: none; }
+        .controls-map { position: absolute; bottom: 20px; right: 20px; z-index: 20; display: flex; flex-direction: column; gap: 10px; }
+        .btn-zoom { background: #2c3e50; color: white; border: 2px solid white; width: 50px; height: 50px; border-radius: 8px; cursor: pointer; font-size: 1.5rem; }
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
+        .player-row { display: flex; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; cursor: pointer; border: 1px solid #ddd; font-weight: bold; }
+        .player-row:hover { background: #e9ecef; border-color: var(--s); }
+        .inventory { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+        .wagon-pill { padding: 6px 10px; border-radius: 4px; font-weight: bold; border: 1px solid #333; font-size: 0.9rem; }
+        select, input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+        button { background: var(--p); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; }
+        /* Couleurs des wagons et équipes */
+        .jaune { background: #FFD700; color: #000; } 
+        .blanc { background: #fff; color: #000; border: 2px solid #333; } 
+        .orange { background: #FF8C00; color: white; } 
+        .violet { background: #8A2BE2; color: white; } /* Nouvelle couleur Violet */
+        .noire { background: #222; color: white; } 
+        .vert { background: #2E7D32; color: white; } 
+        .bleu { background: #1E90FF; color: white; } 
+        .rouge { background: #DC143C; color: white; }
+        @media (max-width: 768px) { #app { flex-direction: column; } #sidebar { width: 100%; height: auto; } }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="sidebar">
+        <div id="screen-setup" class="padding">
+            <h2>🚂 Configuration</h2>
+            <div id="names-inputs">
+                <input type="text" class="input-names" placeholder="Prénom 1">
+                <input type="text" class="input-names" placeholder="Prénom 2">
+                <input type="text" class="input-names" placeholder="Prénom 3">
+                <input type="text" class="input-names" placeholder="Prénom 4">
+                <input type="text" class="input-names" placeholder="Prénom 5">
+            </div>
+            <label style="display:block; margin-top:15px; font-weight:bold;">Couleur d'équipe :</label>
+            <select id="team-color">
+                <option value="rouge">🔴 Rouge</option>
+                <option value="bleu">🔵 Bleue</option>
+                <option value="vert">🟢 Verte</option>
+                <option value="jaune">🟡 Jaune</option>
+                <option value="noire">⚫ Noire</option>
+                <option value="blanc">⚪ Blanche</option>
+                <option value="orange">🟠 Orange</option> <option value="violet">🟣 Violette</option> </select>
+            <button onclick="startGame()" style="background:var(--s); margin-top:15px;">DÉMARRER LA SESSION</button>
+        </div>
+
+        <div id="screen-game" class="padding" style="display:none">
+            <div id="team-badge" class="card" style="text-align: center;">
+                <small>DISTANCE ÉQUIPE :</small><br><strong style="font-size: 1.8rem;" id="dist-team">0 m</strong>
+            </div>
+            <div id="players-list"></div>
+            <div id="inventory-zone" class="inventory"></div>
+            <div class="card">
+                <h3>🛤 Acheter un rail</h3>
+                <select id="sel-a"></select> vers <select id="sel-b"></select>
+                <button onclick="buildRoute()" style="background:var(--s)">Valider le trajet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="map-area">
+        <div class="controls-map">
+            <button class="btn-zoom" onclick="zoomMap(0.2)">+</button>
+            <button class="btn-zoom" onclick="zoomMap(-0.2)">-</button>
+        </div>
+        <div id="map-container"><embed id="svg-embed" src="carte.svg" type="image/svg+xml"></div>
+    </div>
+</div>
+
+<div id="modal-qr" class="modal">
+    <div class="modal-content">
+        <h2 id="qr-title">Validation</h2>
+        <div id="qrcode" style="display:flex; justify-content:center; margin:20px;"></div>
+        <p>Code PIN du prof :</p>
+        <input type="number" id="input-pin" placeholder="---" style="font-size: 2rem; text-align: center;">
+        <button onclick="checkPin()" style="background:var(--s); margin-top:15px;">VALIDER</button>
+    </div>
+</div>
+
+<div id="modal-chance" class="modal">
+    <div class="modal-content">
+        <h2>Wagon Gagné !</h2>
+        <div id="chance-buttons" class="inventory" style="justify-content:center"></div>
+    </div>
+</div>
+
+<script>
+const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","violet"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["violet","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["violet"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","violet"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Poitiers",cost:5,col:["violet"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["violet"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]}];
+
+let state = { scale: 1, color: null, built: [], currentPlayer: null, currentPin: null, distance: 0, inv: {jaune:0,orange:0,violet:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {} };
+
+function clean(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function startGame() {
+    const inputs = Array.from(document.querySelectorAll('.input-names'));
+    inputs.forEach(i => {
+        let val = i.value.trim();
+        if(val !== "") state.individual[clean(val)] = 0;
+    });
+
+    if(Object.keys(state.individual).length < 1) return alert("Prénom requis");
+    
+    state.color = document.getElementById('team-color').value;
+    
+    const badge = document.getElementById('team-badge');
+    badge.className = "card " + state.color;
+    // Ajustement visuel selon la couleur choisie (texte noir pour clair, blanc pour foncé)
+    if(state.color === "blanc" || state.color === "jaune" || state.color === "orange") { // Orange est aussi clair
+        badge.style.color = "black";
+    } else {
+        badge.style.color = "white";
+    }
+    
+    const cities = [...new Set(RAIL_DATA.flatMap(r => [r.u, r.v]))].sort();
+    const sa = document.getElementById('sel-a'), sb = document.getElementById('sel-b');
+    cities.forEach(c => { sa.add(new Option(c,c)); sb.add(new Option(c,c)); });
+    
+    document.getElementById('screen-setup').style.display = 'none';
+    document.getElementById('screen-game').style.display = 'block';
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById('dist-team').innerText = state.distance + " m";
+    const pl = document.getElementById('players-list');
+    pl.innerHTML = "<h3>Coureurs</h3>";
+    
+    for(let name in state.individual) {
+        const row = document.createElement('div');
+        row.className = 'player-row';
+        row.innerHTML = `<span>${name}</span><span>${state.individual[name]}m</span>`;
+        row.onclick = () => askValidation(name);
+        pl.appendChild(row);
+    }
+
+    const iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
+    for(let c in state.inv) if(state.inv[c] > 0) iz.innerHTML += `<div class="wagon-pill ${c}">${state.inv[c]}</div>`;
+}
+
+function askValidation(name) {
+    state.currentPlayer = name;
+    state.currentPin = Math.floor(100 + Math.random() * 899);
+    const data = { team: state.color, player: name, dist: state.distance + 250, pin: state.currentPin };
+    document.getElementById('qrcode').innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
+    document.getElementById('qr-title').innerText = "Validation : " + name;
+    document.getElementById('modal-qr').style.display = 'flex';
+}
+
+function checkPin() {
+    const pinInput = document.getElementById('input-pin');
+    if(parseInt(pinInput.value) === state.currentPin) {
+        state.distance += 250;
+        state.individual[state.currentPlayer] += 250;
+        document.getElementById('modal-qr').style.display = 'none';
+        pinInput.value = "";
+        showChanceModal();
+        updateUI();
+    } else {
+        alert("PIN incorrect !");
+    }
+}
+
+function showChanceModal() {
+    const cols = ['jaune','orange','violet','noire','vert','bleu','rouge','blanc']; /* Mise à jour ici */
+    const pick = cols.sort(() => 0.5 - Math.random()).slice(0, 4);
+    const cont = document.getElementById('chance-buttons'); cont.innerHTML = "";
+    pick.forEach(c => {
+        const b = document.createElement('button'); b.className = `wagon-pill ${c}`;
+        b.innerText = c.toUpperCase(); b.style.width = "auto";
+        b.onclick = () => { state.inv[c]++; document.getElementById('modal-chance').style.display = "none"; updateUI(); };
+        cont.appendChild(b);
+    });
+    document.getElementById('modal-chance').style.display = "flex";
+}
+
+function buildRoute() {
+    const a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
+    if(a === b) return alert("Sélectionnez deux villes différentes");
+    const rail = RAIL_DATA.find(r => (r.u==a && r.v==b) || (r.u==b && r.v==a));
+    if(!rail) return alert("Liaison impossible");
+    let color = rail.col.length > 1 ? prompt(`Couleur (${rail.col.join('/')}) ?`).toLowerCase() : rail.col[0];
+    if(state.inv[color] >= rail.cost) {
+        state.inv[color] -= rail.cost;
+        state.built.push({u:a, v:b, cost: rail.cost});
+        updateUI(); alert("Rail posé !");
+    } else alert("Pas assez de wagons !");
+}
+
+function zoomMap(v) { state.scale += v; document.getElementById('map-container').style.transform = `scale(${state.scale})`; }
+</script>
+</body>
+</html>

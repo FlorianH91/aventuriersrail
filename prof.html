@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôle Professeur</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 15px; background: #f0f2f5; }
+        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-danger { background: #e74c3c; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #eee; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
+        #reader { width: 100%; border-radius: 10px; }
+        .big-pin { font-size: 5rem; font-weight: bold; color: #e74c3c; margin: 15px 0; border: 4px dashed #e74c3c; padding: 10px; background: #fff5f5; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2 style="margin:0; font-size:1.1rem;">Suivi Rail-Fond</h2>
+    <button class="btn" onclick="ouvrirScanner()">SCANNER</button>
+</div>
+
+<table id="tableau-scores">
+    <thead>
+        <tr>
+            <th>Élève</th>
+            <th>Équipe</th>
+            <th>Distance</th>
+            <th>Heure</th>
+        </tr>
+    </thead>
+    <tbody id="corps-tableau"></tbody>
+</table>
+
+<div id="modale-scan" class="overlay">
+    <div class="content">
+        <div id="reader"></div>
+        <button class="btn btn-danger" style="margin-top:20px; width:100%" onclick="fermerTout()">ANNULER</button>
+    </div>
+</div>
+
+<div id="modale-validation" class="overlay">
+    <div class="content">
+        <h2 id="nom-eleve" style="margin:0; color:#2c3e50">Nom</h2>
+        <p style="margin:10px 0 0 0">Code à donner à l'élève :</p>
+        <div id="code-pin" class="big-pin">---</div>
+        <button class="btn" style="width:100%; font-size:1.3rem; padding:20px;" onclick="validerScore()">
+            VALIDER ET FERMER
+        </button>
+    </div>
+</div>
+
+<script>
+let html5QrCode = null;
+let donneesScan = null;
+let scores = {};
+
+function ouvrirScanner() {
+    donneesScan = null;
+    document.getElementById("modale-scan").style.display = "flex";
+
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+    }
+
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        (text) => {
+            try {
+                donneesScan = JSON.parse(text);
+                
+                // ACTION : On bascule les fenêtres immédiatement
+                document.getElementById("modale-scan").style.display = "none";
+                document.getElementById("nom-eleve").innerText = donneesScan.player;
+                document.getElementById("code-pin").innerText = donneesScan.pin;
+                document.getElementById("modale-validation").style.display = "flex";
+                
+                // On stoppe la caméra en arrière-plan
+                html5QrCode.stop().catch(err => console.log("Caméra déjà stoppée"));
+
+            } catch(e) {
+                console.error("Erreur JSON : ", e);
+            }
+        }
+    ).catch(err => alert("Erreur caméra : " + err));
+}
+
+function validerScore() {
+    // Sécurité : si pas de données, on ferme juste
+    if (!donneesScan || !donneesScan.player) {
+        document.getElementById("modale-validation").style.display = "none";
+        return;
+    }
+
+    const nom = donneesScan.player;
+    const equipe = donneesScan.team || "Inconnue";
+    const heure = new Date().toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'});
+
+    // Logique de calcul
+    if (!scores[nom]) {
+        scores[nom] = { equipe: equipe, distance: 250, heure: heure };
+    } else {
+        scores[nom].distance += 250;
+        scores[nom].heure = heure;
+    }
+
+    // Mise à jour de la vue
+    dessinerTableau();
+
+    // Fermeture propre
+    document.getElementById("modale-validation").style.display = "none";
+    donneesScan = null; 
+}
+
+function dessinerTableau() {
+    const corps = document.getElementById("corps-tableau");
+    let html = "";
+
+    for (let nom in scores) {
+        const s = scores[nom];
+        html += `<tr>
+            <td><strong>${nom}</strong></td>
+            <td>${s.equipe}</td>
+            <td><strong>${s.distance} m</strong></td>
+            <td>${s.heure}</td>
+        </tr>`;
+    }
+    corps.innerHTML = html;
+}
+
+function fermerTout() {
+    if (html5QrCode) {
+        html5QrCode.stop().catch(()=>{});
+    }
+    document.getElementById("modale-scan").style.display = "none";
+    document.getElementById("modale-validation").style.display = "none";
+}
+</script>
+
+</body>
+</html>
