@@ -1,0 +1,59 @@
+Missions 3 joueurs : 
+
+Calais - Troyes : 13 wagons 
+Béthune - Tours : 13 wagons
+Brest - Le Havre : 13 wagons
+Lyon - Nice : 13 wagons
+Bayonne - Montpellier : 13 wagons
+Lorient - Limoges : 13 wagons
+Poitiers - Le Havre : 13 wagons
+Douai - Montbéliard : 13 wagons 
+
+
+Missions 4 joueurs : 
+
+Calais - Besançon : 16 wagons
+Dunkerque - Tours : 16 wagons
+Lorient - Amiens : 16 wagons
+Montbéliard - Marseille : 16 wagons
+Bayonne - Marseille : 16 wagons
+Nîmes - Poitiers : 16 wagons
+Tours - Toulouse : 16 wagons
+Saint-Nazaire - Pau : 16 wagons
+
+
+Missions 5 joueurs : 
+
+Calais - Mulhouse : 19 wagons
+Douai - Brest : 19 wagons
+Amiens - Bordeaux : 19 wagons
+Mulhouse - Toulon : 19 wagons
+Poitiers - Toulon : 19 wagons
+Bordeaux - Rouen : 19 wagons
+Perpignan - Tours : 19 wagons
+Montbéliard - Bordeaux : 19 wagons
+
+
+Missions secondaires (à relier à la ville de fin de la mission précédente) :  
+Troyes - Annecy : 7 wagons
+Tours - Saint-Nazaire : 7 wagons
+Le Havre - Béthune : 7 wagons
+Nice - Montpellier : 8 wagons
+Montpellier - Grenoble : 8 wagons
+Limoges  - Saint-Etienne : 7 wagons
+Montbéliard - Lyon : 8 wagons
+Besançon - Grenoble : 7 wagons
+Amiens - Orléans : 7 wagons 
+Marseille - Toulouse : 7 wagons 
+Poitiers - Angers : 7 wagons
+Toulouse - Marseille : 7 wagons
+Pau - Perpignan : 8 wagons
+Mulhouse - Nancy : 7 wagons
+Brest - Nantes : 8 wagons
+Bordeaux - Perpignan : 9 wagons
+Rouen - Douai : 8 wagons
+Toulon - Toulouse : 9 wagons
+
+
+
+

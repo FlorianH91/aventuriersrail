@@ -14,7 +14,22 @@
     <div>
         <h1>Les Aventuriers du Rail-Fond</h1>
         <div class="card-menu" onclick="window.location.href='eleve.html'"><h2>ÉLÈVES</h2><p>Lancer une mission</p></div>
-        <div class="card-menu" onclick="window.location.href='prof.html'"><h2>PROFESSEUR</h2><p>Suivi & Scan</p></div>
+        <div class="card-menu" onclick="accesProf()"><h2>PROFESSEUR</h2><p>Suivi & Scan</p></div>
     </div>
+
+    <script>
+        function accesProf() {
+            // Mot de passe à modifier ici
+            const motDePasse = "Judock91!!";
+            
+            const saisie = prompt("Veuillez saisir le code d'accès professeur :");
+            
+            if (saisie === motDePasse) {
+                window.location.href = 'prof.html';
+            } else if (saisie !== null) {
+                alert("Accès refusé : code incorrect.");
+            }
+        }
+    </script>
 </body>
 </html>
