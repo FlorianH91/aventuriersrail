@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rail-Fond V3.0</title>
+    <title>Rail-Fond V3.0 - Chrono</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --b: #3498db; }
@@ -37,15 +37,12 @@
         .orange { background: #FF8C00 !important; color: white !important; }
         .violet { background: #8A2BE2 !important; color: white !important; }
         .rose { background: #FF69B4; color: white; }
+        .deco-card { min-height: 60px; border: none !important; pointer-events: none; margin: 10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* Stratégie : Hauteur fixe pour que la bande soit imposante même vide */
-        .deco-card { 
-            min-height: 60px; 
-            border: none !important; 
-            pointer-events: none; 
-            margin: 10px 0; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        /* Nouveau Style Chrono */
+        #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 10px 0; color: var(--p); }
+        .btn-chrono { background: var(--p); color: white; font-size: 1.2rem; }
+        .setup-row { display: flex; gap: 5px; margin-bottom: 5px; }
     </style>
 </head>
 <body onload="checkSave()">
@@ -53,11 +50,11 @@
     <div id="screen-setup" class="screen active padding">
         <h2 style="text-align: center;">🚂 Rail-Fond V3.0</h2>
         <div id="names-inputs">
-            <input type="text" class="input-names" placeholder="Prénom 1">
-            <input type="text" class="input-names" placeholder="Prénom 2">
-            <input type="text" class="input-names" placeholder="Prénom 3">
-            <input type="text" class="input-names" placeholder="Prénom 4">
-            <input type="text" class="input-names" placeholder="Prénom 5">
+            <div class="setup-row"><input type="text" class="input-names" placeholder="Prénom"><input type="number" class="input-targets" placeholder="Cible (sec)"></div>
+            <div class="setup-row"><input type="text" class="input-names" placeholder="Prénom"><input type="number" class="input-targets" placeholder="Cible (sec)"></div>
+            <div class="setup-row"><input type="text" class="input-names" placeholder="Prénom"><input type="number" class="input-targets" placeholder="Cible (sec)"></div>
+            <div class="setup-row"><input type="text" class="input-names" placeholder="Prénom"><input type="number" class="input-targets" placeholder="Cible (sec)"></div>
+            <div class="setup-row"><input type="text" class="input-names" placeholder="Prénom"><input type="number" class="input-targets" placeholder="Cible (sec)"></div>
         </div>
         <select id="team-color" style="margin-top:15px;">
             <option value="rouge">🔴 Rouge</option><option value="bleu">🔵 Bleue</option><option value="vert">🟢 Verte</option>
@@ -98,13 +95,21 @@
     <div id="modal-qr" class="modal">
         <div class="modal-content">
             <h2 id="qr-title">Validation</h2>
-            <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
-            <p style="font-size:0.7rem; color:#666;">ID Course : <span id="display-id"></span></p>
-            <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
-            <button class="btn-valid" onclick="checkPin()">CONFIRMER</button>
-            <button class="btn-cancel" onclick="closeModalQR()" style="margin-top:10px;">ANNULER (Erreur de nom)</button>
+            <div id="chrono-zone">
+                <div id="chrono-display">0.0</div>
+                <button id="btn-chrono-toggle" class="btn-chrono" onclick="toggleChrono()">DÉPART</button>
+            </div>
+            <div id="qr-success-zone" style="display:none;">
+                <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
+                <p style="font-size:0.7rem; color:#666;">ID Course : <span id="display-id"></span></p>
+                <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
+                <button class="btn-valid" onclick="checkPin()">CONFIRMER LE PIN</button>
+            </div>
+            <div id="qr-error-msg" style="color:var(--d); font-weight:bold; margin-top:15px; display:none;">Écart trop important (>5s) ! Recommencez.</div>
+            <button class="btn-cancel" onclick="closeModalQR()" style="margin-top:10px;">ANNULER / FERMER</button>
         </div>
     </div>
+    
     <div id="modal-chance" class="modal"><div class="modal-content"><h2>Bravo !</h2><p>Choisis ton wagon :</p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
     
     <div id="modal-win" class="modal">
@@ -125,6 +130,11 @@ const MISSIONS_SEC = [{s:"Troyes",e:"Annecy",w:7},{s:"Tours",e:"Saint-Nazaire",w
 
 let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, isSecondary: false };
 
+// Variables Chrono
+let timer = null;
+let startTime = 0;
+let currentTime = 0;
+
 function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function saveGame() { localStorage.setItem('railfond_v25', JSON.stringify(state)); }
@@ -138,33 +148,32 @@ function setupCities() {
 }
 
 function startGame() {
-    let ns = Array.from(document.querySelectorAll('.input-names')).map(i=>i.value.trim()).filter(n=>n!=="");
-    if(!ns.length) return alert("Prénoms manquants");
-    ns.forEach(n => state.individual[clean(n)] = 0);
+    let inputs = Array.from(document.querySelectorAll('.input-names'));
+    let targets = Array.from(document.querySelectorAll('.input-targets'));
+    let validCount = 0;
+
+    inputs.forEach((inp, i) => {
+        let name = inp.value.trim();
+        let target = parseFloat(targets[i].value);
+        if(name !== "" && !isNaN(target)) {
+            state.individual[clean(name)] = { dist: 0, target: target, realName: name };
+            validCount++;
+        }
+    });
+
+    if(!validCount) return alert("Prénoms et Cibles obligatoires");
     state.color = document.getElementById('team-color').value;
-    let pool = (ns.length >= 5) ? MISSIONS_5 : (ns.length === 4 ? MISSIONS_4 : MISSIONS_3);
+    let pool = (validCount >= 5) ? MISSIONS_5 : (validCount === 4 ? MISSIONS_4 : MISSIONS_3);
     let m = pool[Math.floor(Math.random()*pool.length)];
     state.mission = {s: m.s, e: m.e};
     state.targetWagons = m.w;
     setupCities(); showScreen('screen-game'); saveGame(); updateUI();
 }
 
-function startSecondaryMission() {
-    let possibles = MISSIONS_SEC.filter(m => m.s === state.mission.e);
-    let m = possibles.length > 0 ? possibles[Math.floor(Math.random()*possibles.length)] : MISSIONS_SEC[Math.floor(Math.random()*MISSIONS_SEC.length)];
-    state.mission = {s: m.s, e: m.e};
-    state.targetWagons += m.w;
-    state.isSecondary = true;
-    document.getElementById('modal-win').style.display = 'none';
-    saveGame(); updateUI();
-}
-
 function updateUI() {
-    // Application des couleurs
     document.getElementById('deco-top').className = "card deco-card " + state.color;
     document.getElementById('deco-bottom').className = "card deco-card " + state.color;
     let sc = document.getElementById('team-score-card'); sc.className = "card " + state.color;
-
     document.getElementById('dist-team').innerText = state.distance + " m";
     let prefix = state.isSecondary ? "🥈 SECONDAIRE : " : "📍 MISSION : ";
     document.getElementById('m-title').innerText = prefix + state.mission.s + " ➔ " + state.mission.e;
@@ -177,7 +186,9 @@ function updateUI() {
     document.getElementById('mission-progress-text').innerText = `${curW} / ${state.targetWagons} wagons (${p}%)`;
     let pl = document.getElementById('players-list'); pl.innerHTML = "";
     for(let n in state.individual) {
-        let r = document.createElement('div'); r.className='player-row'; r.innerHTML=`<span>${n}</span><span>${state.individual[n]}m</span>`;
+        let pData = state.individual[n];
+        let r = document.createElement('div'); r.className='player-row'; 
+        r.innerHTML=`<div><span>${pData.realName}</span><br><small>Cible: ${pData.target}s</small></div><span>${pData.dist}m</span>`;
         r.onclick=()=>askValidation(n); pl.appendChild(r);
     }
     let iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
@@ -188,20 +199,83 @@ function updateUI() {
 function askValidation(name) {
     state.currentPlayer = name;
     state.currentPin = Math.floor(100 + Math.random() * 899);
-    const rid = clean(name) + "_" + Date.now();
-    document.getElementById('display-id').innerText = rid;
-    const data = { team: state.color, player: name, dist: state.distance + 250, pin: state.currentPin, id: rid };
-    document.getElementById('qrcode').innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
-    document.getElementById('qr-title').innerText = "Validation : " + name;
+    
+    // Reset Modal
+    document.getElementById('chrono-display').innerText = "0.0";
+    document.getElementById('btn-chrono-toggle').innerText = "DÉPART";
+    document.getElementById('qr-success-zone').style.display = "none";
+    document.getElementById('qr-error-msg').style.display = "none";
+    document.getElementById('chrono-zone').style.display = "block";
+    
+    document.getElementById('qr-title').innerText = "Course de " + state.individual[name].realName;
     document.getElementById('modal-qr').style.display = 'flex';
 }
 
-function closeModalQR() { document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = ""; }
+function toggleChrono() {
+    let btn = document.getElementById('btn-chrono-toggle');
+    if(!timer) {
+        startTime = Date.now();
+        btn.innerText = "STOP";
+        btn.style.background = "var(--d)";
+        timer = setInterval(() => {
+            currentTime = ((Date.now() - startTime) / 1000).toFixed(1);
+            document.getElementById('chrono-display').innerText = currentTime;
+        }, 100);
+    } else {
+        clearInterval(timer);
+        timer = null;
+        btn.innerText = "RESET";
+        btn.style.background = "var(--p)";
+        verifyTime();
+    }
+}
+
+function verifyTime() {
+    let pData = state.individual[state.currentPlayer];
+    let diff = Math.abs(currentTime - pData.target);
+
+    if(diff <= 5) {
+        generateQRCode(currentTime, pData.target);
+    } else {
+        document.getElementById('qr-error-msg').style.display = "block";
+        setTimeout(() => {
+            document.getElementById('chrono-display').innerText = "0.0";
+            document.getElementById('btn-chrono-toggle').innerText = "DÉPART";
+        }, 2000);
+    }
+}
+
+function generateQRCode(real, target) {
+    const rid = state.currentPlayer + "_" + Date.now();
+    document.getElementById('display-id').innerText = rid;
+    
+    const data = { 
+        team: state.color, 
+        player: state.individual[state.currentPlayer].realName, 
+        dist: state.distance + 250, 
+        pin: state.currentPin, 
+        id: rid,
+        tempsRealise: real,
+        tempsCible: target
+    };
+
+    document.getElementById('qrcode').innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
+    
+    document.getElementById('chrono-zone').style.display = "none";
+    document.getElementById('qr-success-zone').style.display = "block";
+}
+
+function closeModalQR() { 
+    clearInterval(timer); 
+    timer = null;
+    document.getElementById('modal-qr').style.display = 'none'; 
+    document.getElementById('input-pin').value = ""; 
+}
 
 function checkPin() {
     if(parseInt(document.getElementById('input-pin').value) === state.currentPin) {
-        state.distance += 250; state.individual[state.currentPlayer] += 250;
+        state.distance += 250; state.individual[state.currentPlayer].dist += 250;
         closeModalQR(); showChanceModal(); saveGame(); updateUI();
     } else alert("Code PIN incorrect");
 }
@@ -221,13 +295,13 @@ function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
     if (a === b) return alert("Villes identiques");
     let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
-    if(!r) return alert("Liaison absente de la liste officielle !");
+    if(!r) return alert("Liaison absente !");
     let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
     if(exist) return alert("Rail déjà posé !");
     let col = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`).toLowerCase() : r.col[0];
     if(state.inv[col] >= r.cost) { 
         state.inv[col] -= r.cost; state.built.push({u:a, v:b}); saveGame(); updateUI(); checkWin(); 
-    } else alert("Il vous manque des wagons " + col);
+    } else alert("Manque de wagons " + col);
 }
 
 function checkWin() {

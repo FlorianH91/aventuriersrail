@@ -6,22 +6,34 @@
     <title>Aventuriers du Rail-Fond</title>
     <style>
         body { margin:0; height:100vh; display:flex; align-items:center; justify-content:center; background: radial-gradient(circle at center, #2e3192, #1b1464); font-family: sans-serif; color:white; text-align:center; }
-        .card-menu { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; cursor: pointer; transition: 0.3s; margin: 10px; display: inline-block; width: 280px; }
+        .card-menu { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; cursor: pointer; transition: 0.3s; margin: 10px; display: inline-block; width: 280px; vertical-align: top; }
         .card-menu:hover { transform: scale(1.05); border-color: #00d2ff; }
     </style>
 </head>
 <body>
     <div>
-        <h1>Les Aventuriers du Rail-Fond</h1>
-        <div class="card-menu" onclick="window.location.href='eleve.html'"><h2>ÉLÈVES</h2><p>Lancer une mission</p></div>
-        <div class="card-menu" onclick="accesProf()"><h2>PROFESSEUR</h2><p>Suivi & Scan</p></div>
+        <h1>Les Aventuriers du Rail - athlétisme</h1>
+        <div class="card-menu" onclick="window.location.href='eleve.html'">
+            <h2>ÉLÈVES</h2>
+            <p>Lancer une mission classique</p>
+        </div>
+        <div class="card-menu" onclick="window.location.href='eleve_cible.html'">
+            <h2>ÉLÈVE - PERF CIBLE</h2>
+            <p>Mission avec performance cible</p>
+        </div>
+        <div class="card-menu" onclick="window.location.href='relais.html'">
+            <h2>ÉLÈVE - RELAIS</h2>
+            <p>Mission en équipe (4x50m)</p>
+        </div>
+        <div class="card-menu" onclick="accesProf()">
+            <h2>PROFESSEUR</h2>
+            <p>Suivi & Scan</p>
+        </div>
     </div>
 
     <script>
         function accesProf() {
-            // Mot de passe à modifier ici
             const motDePasse = "Judock91!!";
-            
             const saisie = prompt("Veuillez saisir le code d'accès professeur :");
             
             if (saisie === motDePasse) {

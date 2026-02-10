@@ -3,174 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contrôle Professeur V1.7</title>
+    <title>Console Prof Rail-Fond V3.0</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 15px; background: #f0f2f5; }
-        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; background: #f0f2f5; }
+        .header { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
         .btn { background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-csv { background: #3498db; }
-        .btn-danger { background: #e74c3c; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 0.9rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background: #eee; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; }
         #reader { width: 100%; border-radius: 10px; }
         .big-pin { font-size: 5rem; font-weight: bold; color: #e74c3c; margin: 15px 0; border: 4px dashed #e74c3c; padding: 10px; background: #fff5f5; }
+        .chrono-pill { display: inline-block; background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; margin: 2px; font-weight: bold; font-size: 0.8rem; }
+        .cible-badge { background: #3498db; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body onload="chargerDonnees()">
 
-<div class="header">
-    <h2 style="margin:0; font-size:1.1rem;">Suivi Rail-Fond</h2>
-    <div style="display:flex; gap:8px;">
-        <button class="btn" onclick="ouvrirScanner()">SCANNER</button>
-        <button class="btn btn-csv" onclick="exporterCSV()">CSV</button>
-        <button class="btn btn-danger" onclick="reinitialiserTout()" style="padding:5px 10px; font-size:0.7rem;">RESET</button>
+    <div class="header">
+        <h2 style="margin:0; font-size:1.1rem;">Suivi Rail-Fond</h2>
+        <div style="display:flex; gap:8px;">
+            <button class="btn" onclick="ouvrirScanner()">📸 SCAN</button>
+            <button class="btn" style="background:#3498db;" onclick="exporterCSV()">📥 CSV</button>
+            <button class="btn" style="background:#e74c3c; font-size:0.7rem;" onclick="reinitialiserTout()">RESET</button>
+        </div>
     </div>
-</div>
 
-<table id="tableau-scores">
-    <thead>
-        <tr>
-            <th>Élève</th>
-            <th>Équipe</th>
-            <th>Distance</th>
-            <th>Heure</th>
-        </tr>
-    </thead>
-    <tbody id="corps-tableau"></tbody>
-</table>
+    <table id="tableau-scores">
+        <thead>
+            <tr>
+                <th>Élève (Équipe)</th>
+                <th>Distance</th>
+                <th>Chronos (s)</th>
+                <th>Cible</th>
+                <th>Dernier passage</th>
+            </tr>
+        </thead>
+        <tbody id="corps-tableau"></tbody>
+    </table>
 
-<div id="modale-scan" class="overlay">
-    <div class="content">
-        <div id="reader"></div>
-        <button class="btn btn-danger" style="margin-top:20px; width:100%" onclick="fermerTout()">ANNULER</button>
+    <div id="modale-scan" class="overlay"><div class="content"><div id="reader"></div><button class="btn" style="background:#e74c3c; margin-top:20px; width:100%" onclick="fermerTout()">ANNULER</button></div></div>
+
+    <div id="modale-validation" class="overlay">
+        <div class="content">
+            <h2 id="nom-eleve" style="margin:0;">---</h2>
+            <p id="detail-perf" style="margin:10px 0; color:#666; font-weight:bold;"></p>
+            <div id="code-pin" class="big-pin">---</div>
+            <button class="btn" style="width:100%; font-size:1.3rem; padding:15px;" onclick="validerScore()">VALIDER</button>
+        </div>
     </div>
-</div>
-
-<div id="modale-validation" class="overlay">
-    <div class="content">
-        <h2 id="nom-eleve" style="margin:0; color:#2c3e50">Nom</h2>
-        <p style="margin:10px 0 0 0">Code à donner à l'élève :</p>
-        <div id="code-pin" class="big-pin">---</div>
-        <button class="btn" style="width:100%; font-size:1.3rem; padding:20px;" onclick="validerScore()">
-            VALIDER ET FERMER
-        </button>
-    </div>
-</div>
 
 <script>
-let html5QrCode = null;
-let donneesScan = null;
-let scores = {};
-let idsValides = new Set();
+let html5QrCode = null, donneesScan = null, scores = {}, idsScannes = new Set();
 
 function chargerDonnees() {
-    const s = localStorage.getItem('rf_pro_scores');
-    const i = localStorage.getItem('rf_pro_ids');
+    const s = localStorage.getItem('rf_v3_scores'), i = localStorage.getItem('rf_v3_ids');
     if(s) scores = JSON.parse(s);
-    if(i) idsValides = new Set(JSON.parse(i));
+    if(i) idsScannes = new Set(JSON.parse(i));
     dessinerTableau();
 }
 
 function sauvegarderDonnees() {
-    localStorage.setItem('rf_pro_scores', JSON.stringify(scores));
-    localStorage.setItem('rf_pro_ids', JSON.stringify(Array.from(idsValides)));
+    localStorage.setItem('rf_v3_scores', JSON.stringify(scores));
+    localStorage.setItem('rf_v3_ids', JSON.stringify(Array.from(idsScannes)));
 }
 
 function exporterCSV() {
-    if (Object.keys(scores).length === 0) return alert("Aucune donnée à exporter.");
-
-    let csvContent = "\uFEFF"; // BOM pour gérer les accents sous Excel
-    csvContent += "Eleve;Equipe;Distance;Heure\n";
-
-    for (let cle in scores) {
-        const s = scores[cle];
-        csvContent += `${s.nom};${s.equipe};${s.distance};${s.heure}\n`;
+    let csv = "\uFEFFEleve;Equipe;Course_N;Chrono;Cible;Heure_Passage\n";
+    for (let k in scores) {
+        let s = scores[k];
+        // Ici, on crée une ligne par course pour l'élève
+        s.courses.forEach((c, index) => {
+            csv += `${s.nom};${s.equipe};${index + 1};${c.chrono};${s.cible};${c.heure}\n`;
+        });
     }
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `resultats_railfond_${new Date().toLocaleDateString()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = `suivi_detaille_railfond.csv`;
+    a.click();
 }
 
-function reinitialiserTout() {
-    if(confirm("Effacer tous les scores ? Pensez à exporter en CSV avant !")) {
-        localStorage.clear();
-        location.reload();
-    }
-}
+function reinitialiserTout() { if(confirm("Effacer tout ?")) { localStorage.clear(); location.reload(); } }
 
 function ouvrirScanner() {
-    donneesScan = null;
     document.getElementById("modale-scan").style.display = "flex";
     if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-
-    html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        (text) => {
-            try {
-                let temp = JSON.parse(text);
-                if (temp.id && idsValides.has(temp.id)) {
-                    alert("⚠️ SCAN DÉJÀ VALIDÉ !\n\nÉlève : " + temp.player + "\nPIN : " + temp.pin);
-                    return; 
-                }
-                donneesScan = temp;
-                document.getElementById("modale-scan").style.display = "none";
-                document.getElementById("nom-eleve").innerText = donneesScan.player + " (" + donneesScan.team + ")";
-                document.getElementById("code-pin").innerText = donneesScan.pin;
-                document.getElementById("modale-validation").style.display = "flex";
-                html5QrCode.stop().catch(() => {});
-            } catch(e) { console.error("Erreur JSON", e); }
-        }
-    ).catch(err => alert("Erreur caméra : " + err));
+    html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+        try {
+            let d = JSON.parse(text);
+            if (idsScannes.has(d.id)) { alert("Déjà validé !"); return; }
+            donneesScan = d;
+            document.getElementById("modale-scan").style.display = "none";
+            document.getElementById("nom-eleve").innerText = d.player;
+            document.getElementById("code-pin").innerText = d.pin;
+            document.getElementById("detail-perf").innerText = `Chrono: ${d.tempsRealise}s (Cible: ${d.tempsCible}s)`;
+            document.getElementById("modale-validation").style.display = "flex";
+            html5QrCode.stop();
+        } catch(e) { alert("Format QR inconnu"); }
+    });
 }
 
 function validerScore() {
-    if (!donneesScan || !donneesScan.player) {
-        document.getElementById("modale-validation").style.display = "none";
-        return;
-    }
-    if (donneesScan.id) idsValides.add(donneesScan.id);
-    const cleUnique = donneesScan.player + "_" + donneesScan.team;
-    const heure = new Date().toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'});
+    if (!donneesScan) return;
+    const key = donneesScan.player + "_" + donneesScan.team;
+    const h = new Date().toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'});
 
-    if (!scores[cleUnique]) {
-        scores[cleUnique] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 250, heure: heure };
-    } else {
-        scores[cleUnique].distance += 250;
-        scores[cleUnique].heure = heure;
+    if (!scores[key]) {
+        scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: donneesScan.tempsCible, courses: [] };
     }
 
-    sauvegarderDonnees();
-    dessinerTableau();
+    scores[key].distance += 250;
+    scores[key].cible = donneesScan.tempsCible; // Mise à jour si la cible change
+    scores[key].courses.push({ chrono: donneesScan.tempsRealise, heure: h });
+    
+    idsScannes.add(donneesScan.id);
+    sauvegarderDonnees(); dessinerTableau();
     document.getElementById("modale-validation").style.display = "none";
-    donneesScan = null; 
 }
 
 function dessinerTableau() {
-    const corps = document.getElementById("corps-tableau");
     let html = "";
-    for (let cle in scores) {
-        const s = scores[cle];
-        html += `<tr><td><strong>${s.nom}</strong></td><td>${s.equipe}</td><td><strong>${s.distance} m</strong></td><td>${s.heure}</td></tr>`;
+    for (let k in scores) {
+        let s = scores[k];
+        let chronosHtml = s.courses.map((c, i) => `<span class="chrono-pill">${c.chrono}</span>`).join('');
+        let derniereHeure = s.courses.length > 0 ? s.courses[s.courses.length - 1].heure : "---";
+
+        html += `<tr>
+            <td><strong>${s.nom}</strong><br><small>${s.equipe.toUpperCase()}</small></td>
+            <td><strong>${s.distance}m</strong></td>
+            <td>${chronosHtml}</td>
+            <td><span class="cible-badge">${s.cible}s</span></td>
+            <td>${derniereHeure}</td>
+        </tr>`;
     }
-    corps.innerHTML = html;
+    document.getElementById("corps-tableau").innerHTML = html;
 }
 
-function fermerTout() {
-    if (html5QrCode) html5QrCode.stop().catch(()=>{});
-    document.getElementById("modale-scan").style.display = "none";
-    document.getElementById("modale-validation").style.display = "none";
-}
+function fermerTout() { if(html5QrCode) html5QrCode.stop(); document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); }
 </script>
 </body>
 </html>
