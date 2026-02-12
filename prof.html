@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Console Prof Rail-Fond V3.0</title>
+    <title>Console Prof Rail-Fond V3.0 (Relais)</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; background: #f0f2f5; }
@@ -23,7 +23,7 @@
 <body onload="chargerDonnees()">
 
     <div class="header">
-        <h2 style="margin:0; font-size:1.1rem;">Suivi Rail-Fond</h2>
+        <h2 style="margin:0; font-size:1.1rem;">Suivi Relais Rail-Fond</h2>
         <div style="display:flex; gap:8px;">
             <button class="btn" onclick="ouvrirScanner()">📸 SCAN</button>
             <button class="btn" style="background:#3498db;" onclick="exporterCSV()">📥 CSV</button>
@@ -34,10 +34,10 @@
     <table id="tableau-scores">
         <thead>
             <tr>
-                <th>Élève (Équipe)</th>
-                <th>Distance</th>
-                <th>Chronos (s)</th>
-                <th>Cible</th>
+                <th>Relayeurs (Équipe)</th>
+                <th>Distance Totale</th>
+                <th>Temps Réalisés (s)</th>
+                <th>Cible (Théorique)</th>
                 <th>Dernier passage</th>
             </tr>
         </thead>
@@ -48,10 +48,10 @@
 
     <div id="modale-validation" class="overlay">
         <div class="content">
-            <h2 id="nom-eleve" style="margin:0;">---</h2>
+            <h2 id="nom-eleve" style="margin:0; font-size: 1.2rem;">---</h2>
             <p id="detail-perf" style="margin:10px 0; color:#666; font-weight:bold;"></p>
             <div id="code-pin" class="big-pin">---</div>
-            <button class="btn" style="width:100%; font-size:1.3rem; padding:15px;" onclick="validerScore()">VALIDER</button>
+            <button class="btn" style="width:100%; font-size:1.3rem; padding:15px;" onclick="validerScore()">VALIDER LE RELAIS</button>
         </div>
     </div>
 
@@ -59,34 +59,33 @@
 let html5QrCode = null, donneesScan = null, scores = {}, idsScannes = new Set();
 
 function chargerDonnees() {
-    const s = localStorage.getItem('rf_v3_scores'), i = localStorage.getItem('rf_v3_ids');
+    const s = localStorage.getItem('rf_v3_relais_scores'), i = localStorage.getItem('rf_v3_relais_ids');
     if(s) scores = JSON.parse(s);
     if(i) idsScannes = new Set(JSON.parse(i));
     dessinerTableau();
 }
 
 function sauvegarderDonnees() {
-    localStorage.setItem('rf_v3_scores', JSON.stringify(scores));
-    localStorage.setItem('rf_v3_ids', JSON.stringify(Array.from(idsScannes)));
+    localStorage.setItem('rf_v3_relais_scores', JSON.stringify(scores));
+    localStorage.setItem('rf_v3_relais_ids', JSON.stringify(Array.from(idsScannes)));
 }
 
 function exporterCSV() {
-    let csv = "\uFEFFEleve;Equipe;Course_N;Chrono;Cible;Heure_Passage\n";
+    let csv = "\uFEFFRelayeurs;Equipe;Course_N;Chrono_Relais;Cible_Theorique;Heure_Passage\n";
     for (let k in scores) {
         let s = scores[k];
-        // Ici, on crée une ligne par course pour l'élève
         s.courses.forEach((c, index) => {
-            csv += `${s.nom};${s.equipe};${index + 1};${c.chrono};${s.cible};${c.heure}\n`;
+            csv += `"${s.nom}";${s.equipe};${index + 1};${c.chrono};${s.cible};${c.heure}\n`;
         });
     }
     const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(b);
-    a.download = `suivi_detaille_railfond.csv`;
+    a.download = `suivi_relais_railfond.csv`;
     a.click();
 }
 
-function reinitialiserTout() { if(confirm("Effacer tout ?")) { localStorage.clear(); location.reload(); } }
+function reinitialiserTout() { if(confirm("Effacer toutes les données prof ?")) { localStorage.clear(); location.reload(); } }
 
 function ouvrirScanner() {
     document.getElementById("modale-scan").style.display = "flex";
@@ -94,12 +93,15 @@ function ouvrirScanner() {
     html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
         try {
             let d = JSON.parse(text);
-            if (idsScannes.has(d.id)) { alert("Déjà validé !"); return; }
+            if (idsScannes.has(d.id)) { 
+                alert("DÉJÀ VALIDÉ !\nLe code PIN était : " + d.pin); 
+                return; 
+            }
             donneesScan = d;
             document.getElementById("modale-scan").style.display = "none";
             document.getElementById("nom-eleve").innerText = d.player;
             document.getElementById("code-pin").innerText = d.pin;
-            document.getElementById("detail-perf").innerText = `Chrono: ${d.tempsRealise}s (Cible: ${d.tempsCible}s)`;
+            document.getElementById("detail-perf").innerText = `Temps: ${d.tempsRealise}s (Cible: ${d.tempsCible}s)`;
             document.getElementById("modale-validation").style.display = "flex";
             html5QrCode.stop();
         } catch(e) { alert("Format QR inconnu"); }
@@ -115,8 +117,9 @@ function validerScore() {
         scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: donneesScan.tempsCible, courses: [] };
     }
 
-    scores[key].distance += 250;
-    scores[key].cible = donneesScan.tempsCible; // Mise à jour si la cible change
+    // Passage à 200m pour le 4x50m
+    scores[key].distance += 200;
+    scores[key].cible = donneesScan.tempsCible;
     scores[key].courses.push({ chrono: donneesScan.tempsRealise, heure: h });
     
     idsScannes.add(donneesScan.id);
