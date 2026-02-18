@@ -70,6 +70,7 @@ function calculerNote(temps, nbF) {
     let nomBareme = nbF + "Filles";
     let baremeChoisi = BAREMES[nomBareme];
     let note = 0;
+    // On cherche la note en partant de la meilleure (index 24)
     for (let i = baremeChoisi.length - 1; i >= 0; i--) {
         if (parseFloat(temps) <= baremeChoisi[i]) {
             note = POINTS[i];
@@ -86,7 +87,7 @@ function exporterCSV() {
             csv += `${couleur};${data.distance};${r.compo};${r.chrono};${r.note}\n`;
         });
     });
-    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' }); // Ajout du BOM pour Excel
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.setAttribute("download", "resultats_rail_fond_V4.csv");
@@ -99,15 +100,7 @@ function ouvrirScanner() {
     html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
         try {
             let d = JSON.parse(text);
-            
-            // --- FUSION DES ALERTES AVEC AFFICHAGE DU PIN ---
-            if (idsScannes.has(d.id)) { 
-                const compoLisible = d.player.replace(/[12-]/g, '');
-                alert("⚠️ SCAN DÉJÀ VALIDÉ !\n\nÉquipe : " + d.team.toUpperCase() + "\nRelais : " + compoLisible + "\nPIN : " + d.pin); 
-                return; 
-            }
-            // ------------------------------------------------
-
+            if (idsScannes.has(d.id)) { alert("DÉJÀ SCANNÉ !"); return; }
             donneesScan = d;
             document.getElementById("modale-scan").style.display = "none";
             document.getElementById("nom-equipe-modale").innerText = "ÉQUIPE " + d.team.toUpperCase();
@@ -145,8 +138,6 @@ function dessinerTableau() {
 function fermerTout() { 
     if(html5QrCode) {
         html5QrCode.stop().then(() => {
-            document.getElementById("modale-scan").style.display='none';
-        }).catch(() => {
             document.getElementById("modale-scan").style.display='none';
         });
     } else {
