@@ -36,7 +36,7 @@
         .noire { background: #222 !important; color: white !important; }
         .blanc { background: #fff !important; color: black !important; border: 2px solid #333 !important; }
         .orange { background: #FF8C00 !important; color: white !important; }
-        .rose { background: #FF69B4 !important; color: white !important; }
+        .rose { background: #FF69B4; color: white; }
         .violet { background: #8A2BE2 !important; color: white !important; }
         #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 10px 0; color: var(--p); }
         .btn-chrono { background: var(--p); color: white; font-size: 1.2rem; }
@@ -45,7 +45,6 @@
         .order-badge { background: var(--b); color: white; padding: 2px 8px; border-radius: 50%; margin-left: 10px; font-size: 0.9rem; }
         .hist-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 5px; }
         .hist-table th, .hist-table td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; }
-        .note-repere { color: #27ae60; font-weight: bold; font-size: 0.85rem; margin-left: 4px; }
     </style>
 </head>
 <body onload="checkSave()">
@@ -100,7 +99,7 @@
                 <button class="btn-valid" onclick="buildRoute()">CONSTRUIRE LE RAIL</button>
             </div>
 
-            <div class="card">
+            <div class="card" style="border-left-color: var(--b);">
                 <h4 style="margin:0 0 10px 0">📜 Historique Rails</h4>
                 <table class="hist-table">
                     <thead><tr><th>Heure</th><th>Trajet</th><th>Coût</th></tr></thead>
@@ -153,13 +152,10 @@
 
 <script>
 const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]}];
-const MISSIONS = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
-const MISSIONS_SEC = [{s:"Troyes",e:"Annecy",w:7},{s:"Tours",e:"Saint-Nazaire",w:7},{s:"Le Havre",e:"Béthune",w:7},{s:"Nice",e:"Montpellier",w:8},{s:"Montpellier",e:"Grenoble",w:8},{s:"Limoges",e:"Saint-Etienne",w:7}];
+const MISSIONS = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16}];
+const MISSIONS_SEC = [{s:"Nancy",e:"Dijon",w:6},{s:"Paris",e:"Rouen",w:5},{s:"Lyon",e:"Grenoble",w:4}];
 const BAREMES = { "4Filles": [38.8,38.7,38.3,37.9,37.5,37.2,36.8,36.5,36.1,35.8,35.4,35.1,34.7,34.4,34.0,33.7,33.3,33.0,32.6,32.3,32.0,31.7,31.4,31.1,30.8], "3Filles": [37.0,36.9,36.5,36.2,35.7,35.4,35.1,34.8,34.5,34.2,33.9,33.6,33.2,33.0,32.6,32.3,32.0,31.7,31.3,31.0,30.7,30.4,29.1,29.8,29.5], "2Filles": [35.2,35.1,34.8,34.5,33.9,33.6,33.3,33.1,32.9,32.6,32.3,32.1,31.8,31.5,31.2,31.0,30.7,30.4,30.0,29.7,29.4,29.1,28.8,28.5,28.1], "1Filles": [33.3,33.2,33.0,32.7,32.1,31.8,31.6,31.3,31.2,31.0,30.8,30.5,30.3,30.1,29.8,29.6,29.3,29.0,28.7,28.4,28.1,27.8,27.5,27.1,26.8], "0Filles": [31.5,31.4,31.2,31.0,30.8,30.6,30.4,30.2,30.0,29.8,29.6,29.4,29.2,29.0,28.8,28.6,28.4,28.2,28.0,27.7,27.4,27.1,26.8,26.5,26.4] };
 const POINTS = [0,0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.25,5.5,5.75,6]; 
-
-const B_F = [11.0,10.8,10.5,10.2,10.0,9.8,9.5,9.3,9.0,8.9,8.8,8.7,8.6,8.5,8.4,8.3,8.2,8.1,8.0,7.9,7.8,7.7,7.6,7.5,7.4];
-const B_G = [9.6,9.3,9.0,8.8,8.6,8.4,8.2,8.1,8.0,7.9,7.8,7.7,7.6,7.5,7.4,7.3,7.2,7.1,7.0,6.9,6.8,6.7,6.6,6.5,6.4];
 
 let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPin: null, pendingWagons: 0, relaisHistory: [], selectedRelayers: [] };
 let timer = null, startTime = 0, currentTime = 0;
@@ -170,24 +166,8 @@ function saveGame() { localStorage.setItem('rf_v40_final', JSON.stringify(state)
 function checkSave() { let s = localStorage.getItem('rf_v40_final'); if(s) { state = JSON.parse(s); setupCities(); showScreen('screen-game'); updateUI(); } }
 function resetGame() { if(confirm("Supprimer toute la progression ?")) { localStorage.clear(); location.reload(); } }
 
-function getNoteRepere(temps, sexe) {
-    if(!temps || temps <= 0) return "--";
-    let bar = (sexe === "F") ? B_F : B_G;
-    let note = 0;
-    for (let i = bar.length - 1; i >= 0; i--) {
-        if (parseFloat(temps) <= bar[i]) { note = POINTS[i]; break; }
-    }
-    return note.toFixed(2);
-}
-
 function updateBanners() {
-    const colSelect = document.getElementById('team-color').value;
-    const col = colSelect || state.color;
-    
-    // Mapping pour mettre à jour la variable CSS --p
-    const colors = {rouge:'#DC143C', bleu:'#1E90FF', vert:'#2E7D32', jaune:'#FFD700', noire:'#222', blanc:'#fff', orange:'#FF8C00', violet:'#8A2BE2'};
-    if(colors[col]) document.documentElement.style.setProperty('--p', colors[col]);
-    
+    const col = document.getElementById('team-color').value || state.color;
     document.querySelectorAll('.banner-flow').forEach(b => { b.className = 'banner-flow ' + col; });
 }
 
@@ -229,9 +209,13 @@ function calculateNote(temps, playersKeys) {
     let nbFilles = playersKeys.filter(k => state.individual[k].letter.includes("2")).length;
     let nomBareme = nbFilles + "Filles";
     let baremeChoisi = BAREMES[nomBareme];
+    
     let note = 0;
     for (let i = baremeChoisi.length - 1; i >= 0; i--) {
-        if (temps <= baremeChoisi[i]) { note = POINTS[i]; break; }
+        if (temps <= baremeChoisi[i]) {
+            note = POINTS[i];
+            break; 
+        }
     }
     return note.toFixed(2);
 }
@@ -249,10 +233,8 @@ function updateUI() {
     for(let n in state.individual) {
         let p = state.individual[n], idx = state.selectedRelayers.indexOf(n);
         let badgeLetter = p.letter.replace(/[12]/g, '');
-        let sexe = p.letter.includes("2") ? "F" : "G";
-        let nRep = getNoteRepere(p.target, sexe);
         pl.innerHTML += `<div class="player-row">
-            <div><span class="id-badge">${badgeLetter}</span><span>${p.realName}</span><br><small>Réf: ${p.target}s <span class="note-repere">(${nRep}/6)</span></small>${idx!==-1?`<span class="order-badge">${idx+1}</span>`:''}</div>
+            <div><span class="id-badge">${badgeLetter}</span><span>${p.realName}</span><br><small>Réf: ${p.target}s</small>${idx!==-1?`<span class="order-badge">${idx+1}</span>`:''}</div>
             <input type="checkbox" class="chk-relais" ${idx!==-1?'checked':''} onchange="handlePlayerSelect(this, '${n}')">
         </div>`;
     }
@@ -268,7 +250,7 @@ function askValidation() {
     const btn = document.getElementById('btn-chrono-toggle');
     btn.innerText = "DÉPART"; btn.style.background = "var(--p)";
     document.getElementById('chrono-display').innerText = "0.00";
-    state.currentTheorique = state.selectedRelayers.reduce((sum, n) => sum + (parseFloat(state.individual[n].target) || 0), 0).toFixed(2);
+    state.currentTheorique = state.selectedRelayers.reduce((sum, n) => sum + state.individual[n].target, 0).toFixed(2);
     const compoVisuelle = state.selectedRelayers.map(n => state.individual[n].letter.replace(/[12]/g, '')).join('');
     state.currentPin = Math.floor(100 + Math.random() * 899);
     document.getElementById('qr-title').innerHTML = `Relais : <span style="color:var(--d)">${compoVisuelle}</span>`;
@@ -327,10 +309,7 @@ function buildRoute() {
     let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
     if(exist) return alert("Attention : Ce rail a déjà été construit !");
     
-    let colChoice = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`) : r.col[0];
-    if (!colChoice) return;
-    let col = colChoice.toLowerCase();
-
+    let col = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`).toLowerCase() : r.col[0];
     if(state.inv[col] >= r.cost) { 
         state.inv[col] -= r.cost; 
         let now = new Date();

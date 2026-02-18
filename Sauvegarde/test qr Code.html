@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Générateur de Test Rail-Fond</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        #qrcode { display: flex; justify-content: center; margin: 20px 0; }
+        .info { background: #f0f2f5; padding: 15px; border-radius: 8px; display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <h2>Générateur de QR Code Test</h2>
+    <div id="qrcode"></div>
+    
+    <div class="info">
+        <p><strong>Équipe :</strong> Bleue</p>
+        <p><strong>Relayeurs :</strong> ABCD</p>
+        <p><strong>PIN :</strong> 842</p>
+    </div>
+
+    <script>
+        // Les données que ton Interface Prof attend
+        const donneesTest = {
+            team: "bleu",
+            player: "B1A2D2C1",
+            dist: 200,
+            pin: 842,
+            id: Date.now(), // ID unique basé sur l'heure actuelle
+            tempsRealise: "27.50",
+            tempsCible: "28.10"
+        };
+
+        // Génération du QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify(donneesTest),
+            width: 256,
+            height: 256,
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>

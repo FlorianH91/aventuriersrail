@@ -14,30 +14,34 @@
     <div>
         <h1>Les Aventuriers du Rail - athlétisme</h1>
         <div class="card-menu" onclick="window.location.href='eleve.html'">
-            <h2>ÉLÈVES</h2>
+            <h2>ÉLÈVES - 1/2 fond</h2>
             <p>Lancer une mission classique</p>
         </div>
         <div class="card-menu" onclick="window.location.href='eleve_cible.html'">
-            <h2>ÉLÈVE - PERF CIBLE</h2>
-            <p>Mission avec performance cible</p>
+            <h2>ÉLÈVE - 1/2 fond - cible</h2>
+            <p>Lancer une mission avec performance cible</p>
         </div>
         <div class="card-menu" onclick="window.location.href='relais.html'">
-            <h2>ÉLÈVE - RELAIS</h2>
-            <p>Mission en équipe (4x50m)</p>
+            <h2>ÉLÈVE - relais</h2>
+            <p>Lancer une mission en équipe (4x50m)</p>
         </div>
-        <div class="card-menu" onclick="accesProf()">
-            <h2>PROFESSEUR</h2>
-            <p>Suivi & Scan</p>
+        <div class="card-menu" onclick="accesProf('prof.html')">
+            <h2>PROF - 1/2 fond</h2>
+            <p>Suivi & Scan 1/2 fond</p>
+        </div>
+        <div class="card-menu" onclick="accesProf('Prof_relais.html')">
+            <h2>PROF - relais</h2>
+            <p>Suivi & Scan Relais</p>
         </div>
     </div>
 
     <script>
-        function accesProf() {
-            const motDePasse = "Judock91!!";
+        function accesProf(page) {
+            const motDePasse = "EPS2026";
             const saisie = prompt("Veuillez saisir le code d'accès professeur :");
             
             if (saisie === motDePasse) {
-                window.location.href = 'prof.html';
+                window.location.href = page;
             } else if (saisie !== null) {
                 alert("Accès refusé : code incorrect.");
             }
