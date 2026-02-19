@@ -15,14 +15,6 @@
         .padding { padding: 15px; }
         .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
         .player-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; border: 1px solid #ddd; font-weight: bold; }
-        
-        /* Alignement Setup une ligne */
-        .setup-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; background: #fff; padding: 5px; border-radius: 6px; border: 1px solid #eee; }
-        .input-names { flex: 3; min-width: 0; }
-        .input-sex { flex: 1; min-width: 50px; }
-        .input-targets { flex: 1.5; min-width: 0; text-align: center; }
-        .btn-open-setup-chrono { flex: 0 0 45px; height: 45px; font-size: 1.2rem; background: #fdfdfd; border: 1px solid #ccc; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-        
         .inventory { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
         .wagon-pill { padding: 8px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #333; display: inline-block; }
         .prog-container { background: #eee; border-radius: 10px; height: 18px; overflow: hidden; margin: 8px 0; border: 1px solid #ccc; }
@@ -31,8 +23,8 @@
         #map-container { transform-origin: top center; transition: transform 0.3s ease; }
         embed { width: 1000px; height: 960px; pointer-events: none; }
         .btn-zoom { background: var(--p); color: white; border: 2px solid white; width: 45px; height: 45px; border-radius: 8px; cursor: pointer; }
-        select, input, button { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; }
-        .btn-valid { background: var(--s); color: white; border: none; font-weight: bold; cursor: pointer; padding: 15px; }
+        select, input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+        .btn-valid { background: var(--s); color: white; border: none; font-weight: bold; cursor: pointer; }
         .btn-cancel { background: var(--d); color: white; border: none; cursor: pointer; }
         .btn-nav { background: var(--b); color: white; font-weight: bold; border: none; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 4000; }
@@ -46,12 +38,8 @@
         .orange { background: #FF8C00 !important; color: white !important; }
         .rose { background: #FF69B4 !important; color: white !important; }
         .violet { background: #8A2BE2 !important; color: white !important; }
-        #chrono-display, #setup-chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 10px 0; color: var(--p); }
+        #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 10px 0; color: var(--p); }
         .btn-chrono { background: var(--p); color: white; font-size: 1.2rem; }
-        
-        .btn-big-round { width: 150px; height: 150px; border-radius: 50%; border: none; background: var(--p); color: white; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin: 20px auto; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .btn-big-round.stop { background: var(--d); }
-
         .chk-relais { width: 25px; height: 25px; margin: 0; }
         .id-badge { background: #333; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 8px; font-family: monospace; font-size: 0.8rem; }
         .order-badge { background: var(--b); color: white; padding: 2px 8px; border-radius: 50%; margin-left: 10px; font-size: 0.9rem; }
@@ -64,65 +52,22 @@
 
     <div id="screen-setup" class="screen active padding">
         <div id="banner-setup-top" class="banner-flow"></div>
-        <h2 style="text-align: center; margin: 10px 0;">🏃‍♂️ Configuration</h2>
-        
+        <h2 style="text-align: center;">🏃‍♂️ Les aventuriers du rail V4.0</h2>
         <div id="names-inputs">
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(0)">⏱️</button>
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(1)">⏱️</button>
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(2)">⏱️</button>
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(3)">⏱️</button>
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(4)">⏱️</button>
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <select class="input-sex"><option value="F">F</option><option value="G" selected>G</option></select>
-                <input type="number" step="0.01" class="input-targets" placeholder="Réf">
-                <button class="btn-open-setup-chrono" onclick="openSetupChrono(5)">⏱️</button>
-            </div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
+            <div style="display:flex; gap:5px; margin-bottom:5px;"><input type="text" class="input-names" placeholder="Prénom"><select class="input-sex" style="width:70px"><option value="F">F</option><option value="G" selected>G</option></select><input type="number" step="0.01" class="input-targets" placeholder="Réf 50m"></div>
         </div>
-
-        <select id="team-color" style="margin-top:10px;" onchange="updateBanners()">
-            <option value="rouge">🔴 Équipe Rouge</option><option value="bleu">🔵 Équipe Bleue</option><option value="vert">🟢 Équipe Verte</option>
-            <option value="jaune">🟡 Équipe Jaune</option><option value="noire">⚫ Équipe Noire</option><option value="blanc">⚪ Équipe Blanche</option>
-            <option value="orange">🟠 Équipe Orange</option><option value="violet">🟣 Équipe Violette</option>
+        <select id="team-color" style="margin-top:15px;" onchange="updateBanners()">
+            <option value="rouge">🔴 Rouge</option><option value="bleu">🔵 Bleue</option><option value="vert">🟢 Verte</option>
+            <option value="jaune">🟡 Jaune</option><option value="noire">⚫ Noire</option><option value="blanc">⚪ Blanche</option>
+            <option value="orange">🟠 Orange</option><option value="violet">🟣 Violette</option>
         </select>
-        
-        <button class="btn-valid" onclick="startGame()" style="margin-top:15px;">DÉMARRER LA MISSION</button>
-        <div id="banner-setup-bottom" class="banner-flow" style="margin-top:15px;"></div>
-    </div>
-
-    <div id="modal-setup-chrono" class="modal">
-        <div class="modal-content">
-            <h3 id="setup-chrono-name">Chronométrage</h3>
-            <div id="setup-chrono-display">0.00</div>
-            <button id="btn-setup-chrono-main" class="btn-big-round" onclick="handleSetupChronoClick()">DÉPART</button>
-            <button class="btn-valid" id="btn-setup-chrono-confirm" onclick="confirmSetupChrono()" style="display:none; width:100%;">VALIDER CE TEMPS</button>
-            <button class="btn-cancel" onclick="closeSetupChrono()" style="margin-top:10px; width:100%; padding:10px; border-radius:6px;">ANNULER / FERMER</button>
-        </div>
+        <button class="btn-valid" onclick="startGame()" style="margin-top:20px;">DÉMARRER LA MISSION</button>
+        <div id="banner-setup-bottom" class="banner-flow" style="margin-top:20px;"></div>
     </div>
 
     <div id="screen-game" class="screen">
@@ -151,8 +96,8 @@
 
             <div class="card">
                 <h3 style="margin:0">🛤 Poser un rail</h3>
-                <select id="sel-a" style="margin-bottom:5px;"></select> vers <select id="sel-b"></select>
-                <button class="btn-valid" onclick="buildRoute()" style="margin-top:10px;">CONSTRUIRE LE RAIL</button>
+                <select id="sel-a"></select> vers <select id="sel-b"></select>
+                <button class="btn-valid" onclick="buildRoute()">CONSTRUIRE LE RAIL</button>
             </div>
 
             <div class="card">
@@ -207,18 +152,17 @@
     </div>
 
 <script>
-// Logique inchangée pour garantir la fiabilité
-const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Poitiers",cost:0,col:["blanc"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]}];
+const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]}];
 const MISSIONS = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
 const MISSIONS_SEC = [{s:"Troyes",e:"Annecy",w:7},{s:"Tours",e:"Saint-Nazaire",w:7},{s:"Le Havre",e:"Béthune",w:7},{s:"Nice",e:"Montpellier",w:8},{s:"Montpellier",e:"Grenoble",w:8},{s:"Limoges",e:"Saint-Etienne",w:7}];
 const BAREMES = { "4Filles": [38.8,38.7,38.3,37.9,37.5,37.2,36.8,36.5,36.1,35.8,35.4,35.1,34.7,34.4,34.0,33.7,33.3,33.0,32.6,32.3,32.0,31.7,31.4,31.1,30.8], "3Filles": [37.0,36.9,36.5,36.2,35.7,35.4,35.1,34.8,34.5,34.2,33.9,33.6,33.2,33.0,32.6,32.3,32.0,31.7,31.3,31.0,30.7,30.4,29.1,29.8,29.5], "2Filles": [35.2,35.1,34.8,34.5,33.9,33.6,33.3,33.1,32.9,32.6,32.3,32.1,31.8,31.5,31.2,31.0,30.7,30.4,30.0,29.7,29.4,29.1,28.8,28.5,28.1], "1Filles": [33.3,33.2,33.0,32.7,32.1,31.8,31.6,31.3,31.2,31.0,30.8,30.5,30.3,30.1,29.8,29.6,29.3,29.0,28.7,28.4,28.1,27.8,27.5,27.1,26.8], "0Filles": [31.5,31.4,31.2,31.0,30.8,30.6,30.4,30.2,30.0,29.8,29.6,29.4,29.2,29.0,28.8,28.6,28.4,28.2,28.0,27.7,27.4,27.1,26.8,26.5,26.4] };
 const POINTS = [0,0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.25,4.5,4.75,5,5.25,5.5,5.75,6]; 
+
 const B_F = [11.0,10.8,10.5,10.2,10.0,9.8,9.5,9.3,9.0,8.9,8.8,8.7,8.6,8.5,8.4,8.3,8.2,8.1,8.0,7.9,7.8,7.7,7.6,7.5,7.4];
 const B_G = [9.6,9.3,9.0,8.8,8.6,8.4,8.2,8.1,8.0,7.9,7.8,7.7,7.6,7.5,7.4,7.3,7.2,7.1,7.0,6.9,6.8,6.7,6.6,6.5,6.4];
 
 let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPin: null, pendingWagons: 0, relaisHistory: [], selectedRelayers: [] };
 let timer = null, startTime = 0, currentTime = 0;
-let setupTimerInterval = null, setupStartTime = 0, currentSetupIndex = null;
 
 function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
@@ -236,50 +180,14 @@ function getNoteRepere(temps, sexe) {
     return note.toFixed(2);
 }
 
-function openSetupChrono(index) {
-    currentSetupIndex = index;
-    const name = document.querySelectorAll('.input-names')[index].value || "Élève " + (index + 1);
-    document.getElementById('setup-chrono-name').innerText = "Chrono : " + name;
-    document.getElementById('setup-chrono-display').innerText = "0.00";
-    document.getElementById('btn-setup-chrono-main').innerText = "DÉPART";
-    document.getElementById('btn-setup-chrono-main').className = "btn-big-round";
-    document.getElementById('btn-setup-chrono-confirm').style.display = "none";
-    document.getElementById('modal-setup-chrono').style.display = "flex";
-}
-
-function handleSetupChronoClick() {
-    const btn = document.getElementById('btn-setup-chrono-main');
-    if (btn.innerText === "DÉPART") {
-        setupStartTime = Date.now();
-        btn.innerText = "STOP";
-        btn.classList.add('stop');
-        setupTimerInterval = setInterval(() => {
-            document.getElementById('setup-chrono-display').innerText = ((Date.now() - setupStartTime) / 1000).toFixed(2);
-        }, 50);
-    } else {
-        clearInterval(setupTimerInterval);
-        btn.innerText = "DÉPART";
-        btn.classList.remove('stop');
-        document.getElementById('btn-setup-chrono-confirm').style.display = "block";
-    }
-}
-
-function confirmSetupChrono() {
-    const time = document.getElementById('setup-chrono-display').innerText;
-    document.querySelectorAll('.input-targets')[currentSetupIndex].value = time;
-    closeSetupChrono();
-}
-
-function closeSetupChrono() {
-    clearInterval(setupTimerInterval);
-    document.getElementById('modal-setup-chrono').style.display = "none";
-}
-
 function updateBanners() {
     const colSelect = document.getElementById('team-color').value;
     const col = colSelect || state.color;
+    
+    // Mapping pour mettre à jour la variable CSS --p
     const colors = {rouge:'#DC143C', bleu:'#1E90FF', vert:'#2E7D32', jaune:'#FFD700', noire:'#222', blanc:'#fff', orange:'#FF8C00', violet:'#8A2BE2'};
     if(colors[col]) document.documentElement.style.setProperty('--p', colors[col]);
+    
     document.querySelectorAll('.banner-flow').forEach(b => { b.className = 'banner-flow ' + col; });
 }
 
@@ -413,14 +321,16 @@ function showChanceModal() {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
-    if(a === b) return alert("Erreur : Même ville !");
+    if(a === b) return alert("Erreur : Vous avez sélectionné deux fois la même ville !");
     let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
-    if(!r) return alert("Erreur : Rail inexistant !");
+    if(!r) return alert("Erreur : Ce rail n'existe pas sur la carte !");
     let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
-    if(exist) return alert("Rail déjà construit !");
+    if(exist) return alert("Attention : Ce rail a déjà été construit !");
+    
     let colChoice = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`) : r.col[0];
     if (!colChoice) return;
     let col = colChoice.toLowerCase();
+
     if(state.inv[col] >= r.cost) { 
         state.inv[col] -= r.cost; 
         let now = new Date();
@@ -428,7 +338,7 @@ function buildRoute() {
         saveGame(); updateUI(); 
         checkWin(); 
     } else {
-        alert(`Manque wagons ${col.toUpperCase()} !`);
+        alert(`Action impossible : Il vous manque des wagons ${col.toUpperCase()} ! (Besoin : ${r.cost}, Stock : ${state.inv[col]})`);
     }
 }
 
@@ -444,7 +354,9 @@ function checkWin() {
 
 function startSecondaryMission() {
     let m = MISSIONS_SEC[Math.floor(Math.random()*MISSIONS_SEC.length)];
-    state.mission = {s: m.s, e: m.e}; state.targetWagons = m.w;
+    state.mission = {s: m.s, e: m.e};
+    state.targetWagons = m.w;
+    state.isSecondary = true;
     document.getElementById('modal-win').style.display='none';
     saveGame(); updateUI();
 }
