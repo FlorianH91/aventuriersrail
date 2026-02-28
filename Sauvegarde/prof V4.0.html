@@ -117,8 +117,8 @@ function validerScore() {
         scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: donneesScan.tempsCible, courses: [] };
     }
 
-    // Passage à 200m pour le 4x50m
-    scores[key].distance += 200;
+    // Passage à 250m 
+    scores[key].distance += 250;
     scores[key].cible = donneesScan.tempsCible;
     scores[key].courses.push({ chrono: donneesScan.tempsRealise, heure: h });
     
