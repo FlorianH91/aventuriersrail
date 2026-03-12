@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Les aventuriers du rail - 1/2 fond - Perf cible V5.0</title>
+    <title>Les aventuriers du rail - 1/2 Fond V5.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --b: #3498db; }
@@ -37,14 +37,15 @@
         .orange { background: #FF8C00 !important; color: white !important; }
         .violet { background: #8A2BE2 !important; color: white !important; }
         .rose { background: #FF69B4; color: white; }
-        .deco-card { min-height: 60px; border: none !important; pointer-events: none; margin: 10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 5px 0; color: var(--p); }
-        .btn-chrono { background: var(--p); color: white; font-size: 1.2rem; }
-        .setup-row { display: flex; gap: 5px; margin-bottom: 5px; }
-        .setup-row input:first-child { flex: 2; }
-        .setup-row input { flex: 1; text-align: center; }
-        .target-reminder { font-size: 1.2rem; font-weight: bold; color: var(--b); margin-bottom: 5px; }
+        /* Stratégie : Hauteur fixe pour que la bande soit imposante même vide */
+        .deco-card { 
+            min-height: 60px; 
+            border: none !important; 
+            pointer-events: none; 
+            margin: 10px 0; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body onload="checkSave()">
@@ -52,31 +53,11 @@
     <div id="screen-setup" class="screen active padding">
         <h2 style="text-align: center;">🚂 Les aventuriers du rail - 1/2 fond V5.0</h2>
         <div id="names-inputs">
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <input type="number" class="input-min" placeholder="Min" min="0">
-                <input type="number" class="input-sec" placeholder="Sec" min="0" max="59" oninput="if(this.value>59)this.value=59">
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <input type="number" class="input-min" placeholder="Min" min="0">
-                <input type="number" class="input-sec" placeholder="Sec" min="0" max="59" oninput="if(this.value>59)this.value=59">
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <input type="number" class="input-min" placeholder="Min" min="0">
-                <input type="number" class="input-sec" placeholder="Sec" min="0" max="59" oninput="if(this.value>59)this.value=59">
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <input type="number" class="input-min" placeholder="Min" min="0">
-                <input type="number" class="input-sec" placeholder="Sec" min="0" max="59" oninput="if(this.value>59)this.value=59">
-            </div>
-            <div class="setup-row">
-                <input type="text" class="input-names" placeholder="Prénom">
-                <input type="number" class="input-min" placeholder="Min" min="0">
-                <input type="number" class="input-sec" placeholder="Sec" min="0" max="59" oninput="if(this.value>59)this.value=59">
-            </div>
+            <input type="text" class="input-names" placeholder="Prénom 1">
+            <input type="text" class="input-names" placeholder="Prénom 2">
+            <input type="text" class="input-names" placeholder="Prénom 3">
+            <input type="text" class="input-names" placeholder="Prénom 4">
+            <input type="text" class="input-names" placeholder="Prénom 5">
         </div>
         <select id="team-color" style="margin-top:15px;">
             <option value="rouge">🔴 Rouge</option><option value="bleu">🔵 Bleue</option><option value="vert">🟢 Verte</option>
@@ -117,27 +98,19 @@
     <div id="modal-qr" class="modal">
         <div class="modal-content">
             <h2 id="qr-title">Validation</h2>
-            <div id="chrono-zone">
-                <div id="target-display" class="target-reminder">Cible : --:--</div>
-                <div id="chrono-display">0:00.0</div>
-                <button id="btn-chrono-toggle" class="btn-chrono" onclick="toggleChrono()">DÉPART</button>
-            </div>
-            <div id="qr-success-zone" style="display:none;">
-                <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
-                <p style="font-size:0.7rem; color:#666;">ID Course : <span id="display-id"></span></p>
-                <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
-                <button class="btn-valid" onclick="checkPin()">CONFIRMER LE PIN</button>
-            </div>
-            <div id="qr-error-msg" style="color:var(--d); font-weight:bold; margin-top:15px; display:none;">Écart trop important ! Recommencez.</div>
-            <button class="btn-cancel" onclick="closeModalQR()" style="margin-top:10px;">ANNULER / FERMER</button>
+            <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
+            <p style="font-size:0.7rem; color:#666;">ID Course : <span id="display-id"></span></p>
+            <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
+            <button class="btn-valid" onclick="checkPin()">CONFIRMER</button>
+            <button class="btn-cancel" onclick="closeModalQR()" style="margin-top:10px;">ANNULER (Erreur de nom)</button>
         </div>
     </div>
-    
     <div id="modal-chance" class="modal"><div class="modal-content"><h2>Bravo !</h2><p>Choisis ton wagon :</p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
     
     <div id="modal-win" class="modal">
         <div class="modal-content" style="background:#f1c40f;">
             <h1>🏆 VICTOIRE !</h1>
+            <button class="btn-valid" onclick="startSecondaryMission()" style="background:#2ecc71;">MISSION SECONDAIRE (+ courte)</button>
             <button class="btn-valid" onclick="resetGame()" style="background:#e67e22; margin-top:10px;">REJOUER (Nouvelle partie)</button>
         </div>
     </div>
@@ -145,24 +118,12 @@
 <script>
 const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]},{u:"Grenoble", v:"Valence", cost:2, col:["jaune"]},];
 
-const MISSIONS_3 = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
+const MISSIONS_3 = [{s:"Calais",e:"Troyes",w:13},{s:"Béthune",e:"Tours",w:13},{s:"Brest",e:"Le Havre",w:13},{s:"Lyon",e:"Nice",w:13},{s:"Bayonne",e:"Montpellier",w:13},{s:"Lorient",e:"Limoges",w:13},{s:"Poitiers",e:"Le Havre",w:13},{s:"Douai",e:"Montbéliard",w:13}];
+const MISSIONS_4 = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
+const MISSIONS_5 = [{s:"Calais",e:"Mulhouse",w:19},{s:"Douai",e:"Brest",w:19},{s:"Amiens",e:"Bordeaux",w:19},{s:"Mulhouse",e:"Toulon",w:19},{s:"Poitiers",e:"Toulon",w:19},{s:"Bordeaux",e:"Rouen",w:19},{s:"Perpignan",e:"Tours",w:19},{s:"Montbéliard",e:"Bordeaux",w:19}];
+const MISSIONS_SEC = [{s:"Troyes",e:"Annecy",w:7},{s:"Tours",e:"Saint-Nazaire",w:7},{s:"Le Havre",e:"Béthune",w:7},{s:"Nice",e:"Montpellier",w:8},{s:"Montpellier",e:"Grenoble",w:8},{s:"Limoges",e:"Saint-Etienne",w:7},{s:"Montbéliard",e:"Lyon",w:8},{s:"Besançon",e:"Grenoble",w:7},{s:"Amiens",e:"Orléans",w:7},{s:"Marseille",e:"Toulouse",w:7},{s:"Poitiers",e:"Angers",w:7},{s:"Toulouse",e:"Marseille",w:7},{s:"Pau",e:"Perpignan",w:8},{s:"Mulhouse",e:"Nancy",w:7},{s:"Brest",e:"Nantes",w:8},{s:"Bordeaux",e:"Perpignan",w:9},{s:"Rouen",e:"Douai",w:8},{s:"Toulon",e:"Toulouse",w:9}];
 
-const MISSIONS_4 = [{s:"Calais",e:"Mulhouse",w:19},{s:"Douai",e:"Brest",w:19},{s:"Amiens",e:"Bordeaux",w:19},{s:"Mulhouse",e:"Toulon",w:19},{s:"Poitiers",e:"Toulon",w:19},{s:"Bordeaux",e:"Rouen",w:19},{s:"Perpignan",e:"Tours",w:19},{s:"Montbéliard",e:"Bordeaux",w:19}];
-
-const MISSIONS_5 = 
-[{s:"Brest",e:"Nancy",w:25},{s:"Nice",e:"Nantes",w:26},{s:"Calais",e:"Clermont-Ferrand",w:24},{s:"Nice",e:"Strasbourg",w:25},{s:"Dijon",e:"Bayonne",w:25}, {s:"Mulhouse",e:"Saint-Nazaire",w:25},{s:"Amiens",e:"Toulouse",w:25}];
-
-let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, lastGain: 0 };
-
-let timer = null;
-let startTime = 0;
-let currentTime = 0;
-
-function formatTime(totalSec) {
-    let m = Math.floor(totalSec / 60);
-    let s = (totalSec % 60).toFixed(1);
-    return m + ":" + s.padStart(4, '0');
-}
+let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, isSecondary: false };
 
 function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
@@ -177,35 +138,36 @@ function setupCities() {
 }
 
 function startGame() {
-    let names = Array.from(document.querySelectorAll('.input-names'));
-    let mins = Array.from(document.querySelectorAll('.input-min'));
-    let secs = Array.from(document.querySelectorAll('.input-sec'));
-    let validCount = 0;
-    names.forEach((inp, i) => {
-        let name = inp.value.trim();
-        let m = parseInt(mins[i].value) || 0;
-        let s = parseInt(secs[i].value) || 0;
-        let totalSec = (m * 60) + s;
-        if(name !== "" && totalSec > 0) {
-            state.individual[clean(name)] = { dist: 0, target: totalSec, realName: name };
-            validCount++;
-        }
-    });
-    if(!validCount) return alert("Prénoms et Cibles obligatoires");
+    let ns = Array.from(document.querySelectorAll('.input-names')).map(i=>i.value.trim()).filter(n=>n!=="");
+    if(!ns.length) return alert("Prénoms manquants");
+    ns.forEach(n => state.individual[clean(n)] = 0);
     state.color = document.getElementById('team-color').value;
-    let pool = (validCount >= 5) ? MISSIONS_5 : (validCount === 4 ? MISSIONS_4 : MISSIONS_3);
+    let pool = (ns.length >= 5) ? MISSIONS_5 : (ns.length === 4 ? MISSIONS_4 : MISSIONS_3);
     let m = pool[Math.floor(Math.random()*pool.length)];
     state.mission = {s: m.s, e: m.e};
     state.targetWagons = m.w;
     setupCities(); showScreen('screen-game'); saveGame(); updateUI();
 }
 
+function startSecondaryMission() {
+    let possibles = MISSIONS_SEC.filter(m => m.s === state.mission.e);
+    let m = possibles.length > 0 ? possibles[Math.floor(Math.random()*possibles.length)] : MISSIONS_SEC[Math.floor(Math.random()*MISSIONS_SEC.length)];
+    state.mission = {s: m.s, e: m.e};
+    state.targetWagons += m.w;
+    state.isSecondary = true;
+    document.getElementById('modal-win').style.display = 'none';
+    saveGame(); updateUI();
+}
+
 function updateUI() {
+    // Application des couleurs
     document.getElementById('deco-top').className = "card deco-card " + state.color;
     document.getElementById('deco-bottom').className = "card deco-card " + state.color;
     let sc = document.getElementById('team-score-card'); sc.className = "card " + state.color;
+
     document.getElementById('dist-team').innerText = state.distance + " m";
-    document.getElementById('m-title').innerText = "📍 MISSION : " + state.mission.s + " ➔ " + state.mission.e;
+    let prefix = state.isSecondary ? "🥈 SECONDAIRE : " : "📍 MISSION : ";
+    document.getElementById('m-title').innerText = prefix + state.mission.s + " ➔ " + state.mission.e;
     let curW = state.built.reduce((acc, b) => { 
         let r = RAIL_DATA.find(rd => (rd.u==b.u && rd.v==b.v) || (rd.v==b.u && rd.u==b.v));
         return acc + (r ? r.cost : 0); 
@@ -215,11 +177,7 @@ function updateUI() {
     document.getElementById('mission-progress-text').innerText = `${curW} / ${state.targetWagons} wagons (${p}%)`;
     let pl = document.getElementById('players-list'); pl.innerHTML = "";
     for(let n in state.individual) {
-        let pData = state.individual[n];
-        let r = document.createElement('div'); r.className='player-row'; 
-        let m = Math.floor(pData.target/60); let s = pData.target%60;
-        let targetDisp = m + ":" + s.toString().padStart(2,'0');
-        r.innerHTML=`<div><span>${pData.realName}</span><br><small>Cible: ${targetDisp}</small></div><span>${pData.dist}m</span>`;
+        let r = document.createElement('div'); r.className='player-row'; r.innerHTML=`<span>${n}</span><span>${state.individual[n]}m</span>`;
         r.onclick=()=>askValidation(n); pl.appendChild(r);
     }
     let iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
@@ -230,79 +188,30 @@ function updateUI() {
 function askValidation(name) {
     state.currentPlayer = name;
     state.currentPin = Math.floor(100 + Math.random() * 899);
-    let pData = state.individual[name];
-    let m = Math.floor(pData.target/60); let s = pData.target%60;
-    document.getElementById('target-display').innerText = "Cible : " + m + ":" + s.toString().padStart(2,'0');
-    document.getElementById('chrono-display').innerText = "0:00.0";
-    document.getElementById('btn-chrono-toggle').innerText = "DÉPART";
-    document.getElementById('btn-chrono-toggle').style.background = "var(--p)";
-    document.getElementById('qr-success-zone').style.display = "none";
-    document.getElementById('qr-error-msg').style.display = "none";
-    document.getElementById('chrono-zone').style.display = "block";
-    document.getElementById('qr-title').innerText = "Course de " + pData.realName;
+    const rid = clean(name) + "_" + Date.now();
+    document.getElementById('display-id').innerText = rid;
+    const data = { team: state.color, player: name, dist: state.distance + 250, pin: state.currentPin, id: rid };
+    document.getElementById('qrcode').innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
+    document.getElementById('qr-title').innerText = "Validation : " + name;
     document.getElementById('modal-qr').style.display = 'flex';
 }
 
-function toggleChrono() {
-    let btn = document.getElementById('btn-chrono-toggle');
-    if(!timer) {
-        startTime = Date.now();
-        btn.innerText = "STOP"; btn.style.background = "var(--d)";
-        timer = setInterval(() => {
-            currentTime = (Date.now() - startTime) / 1000;
-            document.getElementById('chrono-display').innerText = formatTime(currentTime);
-        }, 100);
-    } else {
-        clearInterval(timer); timer = null;
-        btn.innerText = "RESET"; btn.style.background = "var(--p)";
-        verifyTime();
-    }
-}
-
-function verifyTime() {
-    let pData = state.individual[state.currentPlayer];
-    let diff = Math.abs(currentTime - pData.target);
-    let gain = (diff < 5) ? 3 : (diff <= 10 ? 2 : 1);
-    state.lastGain = gain;
-    generateQRCode(currentTime, pData.target, gain);
-}
-
-function generateQRCode(real, target, gain) {
-    const rid = state.currentPlayer + "_" + Date.now();
-    document.getElementById('display-id').innerText = rid;
-    const data = { 
-        team: state.color, 
-        player: state.individual[state.currentPlayer].realName, 
-        dist: state.distance + 250, 
-        pin: state.currentPin, 
-        id: rid,
-        tempsRealise: real.toFixed(1),
-        tempsCible: target,
-        wagonsGagnes: gain
-    };
-    document.getElementById('qrcode').innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
-    document.getElementById('chrono-zone').style.display = "none";
-    document.getElementById('qr-success-zone').style.display = "block";
-}
-
-function closeModalQR() { clearInterval(timer); timer = null; document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = ""; }
+function closeModalQR() { document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = ""; }
 
 function checkPin() {
     if(parseInt(document.getElementById('input-pin').value) === state.currentPin) {
-        state.distance += 250; state.individual[state.currentPlayer].dist += 250;
-        closeModalQR(); showChanceModal(state.lastGain); saveGame(); updateUI();
+        state.distance += 250; state.individual[state.currentPlayer] += 250;
+        closeModalQR(); showChanceModal(); saveGame(); updateUI();
     } else alert("Code PIN incorrect");
 }
 
-function showChanceModal(rem) {
-    if (rem <= 0) { document.getElementById('modal-chance').style.display = "none"; return; }
+function showChanceModal() {
     let cs = ['jaune','orange','rose','noire','vert','bleu','rouge','blanc'], pk = cs.sort(()=>0.5-Math.random()).slice(0,4);
     let ct = document.getElementById('chance-buttons'); ct.innerHTML = "";
-    document.querySelector('#modal-chance h2').innerText = `Bravo ! (Encore ${rem} à choisir)`;
     pk.forEach(c => {
         let b = document.createElement('button'); b.className = `wagon-pill ${c}`; b.innerText = c.toUpperCase();
-        b.onclick = () => { state.inv[c]++; saveGame(); updateUI(); showChanceModal(rem - 1); };
+        b.onclick = () => { state.inv[c]++; document.getElementById('modal-chance').style.display="none"; saveGame(); updateUI(); };
         ct.appendChild(b);
     });
     document.getElementById('modal-chance').style.display = "flex";
@@ -310,17 +219,16 @@ function showChanceModal(rem) {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
-    
-    // ... (vérifications villes identiques et rail déjà posé) ...
-
-    const coutTotal = parseInt(r.cost);
-    let paiement = {};
-    let totalSaisi = 0;
-
-    // C'EST CETTE BOUCLE QUI DOIT REMPLACER L'ANCIEN PROMPT
-    for (let i = 0; i < r.col.length; i++) {
-        let couleur = r.col[i];
-        // ... le reste du code avec le prompt spécifique par couleur ...
+    if (a === b) return alert("Villes identiques");
+    let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
+    if(!r) return alert("Liaison absente de la liste officielle !");
+    let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
+    if(exist) return alert("Rail déjà posé !");
+    let col = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`).toLowerCase() : r.col[0];
+    if(state.inv[col] >= r.cost) { 
+        state.inv[col] -= r.cost; state.built.push({u:a, v:b}); saveGame(); updateUI(); checkWin(); 
+    } else alert("Il vous manque des wagons " + col);
+}
 
 function checkWin() {
     let v = new Set(), q = [state.mission.s];

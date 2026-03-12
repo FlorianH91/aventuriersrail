@@ -414,24 +414,17 @@ function showChanceModal() {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
-    if(a === b) return alert("Erreur : Même ville !");
-    let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
-    if(!r) return alert("Erreur : Rail inexistant !");
-    let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
-    if(exist) return alert("Rail déjà construit !");
-    let colChoice = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`) : r.col[0];
-    if (!colChoice) return;
-    let col = colChoice.toLowerCase();
-    if(state.inv[col] >= r.cost) { 
-        state.inv[col] -= r.cost; 
-        let now = new Date();
-        state.built.push({u:a, v:b, cost: r.cost, col: col, h: now.getHours()+":"+now.getMinutes().toString().padStart(2,'0')}); 
-        saveGame(); updateUI(); 
-        checkWin(); 
-    } else {
-        alert(`Manque wagons ${col.toUpperCase()} !`);
-    }
-}
+    
+    // ... (vérifications villes identiques et rail déjà posé) ...
+
+    const coutTotal = parseInt(r.cost);
+    let paiement = {};
+    let totalSaisi = 0;
+
+    // C'EST CETTE BOUCLE QUI DOIT REMPLACER L'ANCIEN PROMPT
+    for (let i = 0; i < r.col.length; i++) {
+        let couleur = r.col[i];
+        // ... le reste du code avec le prompt spécifique par couleur ...
 
 function checkWin() {
     let v = new Set(), q = [state.mission.s];

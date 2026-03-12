@@ -219,16 +219,61 @@ function showChanceModal() {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
+    
     if (a === b) return alert("Villes identiques");
     let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
     if(!r) return alert("Liaison absente de la liste officielle !");
     let exist = state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
     if(exist) return alert("Rail déjà posé !");
-    let col = r.col.length > 1 ? prompt(`Couleur (${r.col.join('/')}) ?`).toLowerCase() : r.col[0];
-    if(state.inv[col] >= r.cost) { 
-        state.inv[col] -= r.cost; state.built.push({u:a, v:b}); saveGame(); updateUI(); checkWin(); 
-    } else alert("Il vous manque des wagons " + col);
+
+    const coutTotal = parseInt(r.cost);
+    let paiement = {};
+    let totalSaisi = 0;
+
+    // On demande pour chaque couleur autorisée
+    for (let i = 0; i < r.col.length; i++) {
+        let couleur = r.col[i];
+        let stockDispo = state.inv[couleur] || 0;
+        let resteAFournir = coutTotal - totalSaisi;
+
+        if (resteAFournir > 0) {
+            let reponse = prompt(
+                `Route vers ${b} (Coût : ${coutTotal})\n` +
+                `Couleur : ${couleur.toUpperCase()}\n` +
+                `Votre stock : ${stockDispo}\n\n` +
+                `Combien de wagons ${couleur} voulez-vous utiliser ?`, 
+                Math.min(stockDispo, resteAFournir)
+            );
+
+            let n = parseInt(reponse) || 0;
+            if (n > stockDispo) {
+                alert(`Erreur : Vous n'avez que ${stockDispo} wagons ${couleur}.`);
+                return; // Annule tout
+            }
+            paiement[couleur] = n;
+            totalSaisi += n;
+        }
+    }
+
+    // Vérification finale du montant
+    if (totalSaisi === coutTotal) {
+        // Débit du stock
+        for (let c in paiement) {
+            state.inv[c] -= paiement[c];
+        }
+        
+        state.built.push({u: a, v: b});
+        saveGame();
+        updateUI();
+        checkWin();
+        alert("Route construite avec succès !");
+    } else if (totalSaisi < coutTotal) {
+        alert(`Paiement insuffisant : ${totalSaisi} wagons fournis sur ${coutTotal} nécessaires.`);
+    } else {
+        alert("Erreur : Vous avez tenté d'utiliser trop de wagons.");
+    }
 }
+
 
 function checkWin() {
     let v = new Set(), q = [state.mission.s];
