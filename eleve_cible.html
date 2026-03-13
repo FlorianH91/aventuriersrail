@@ -38,7 +38,6 @@
         .violet { background: #8A2BE2 !important; color: white !important; }
         .rose { background: #FF69B4; color: white; }
         .deco-card { min-height: 60px; border: none !important; pointer-events: none; margin: 10px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
         #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 5px 0; color: var(--p); }
         .btn-chrono { background: var(--p); color: white; font-size: 1.2rem; }
         .setup-row { display: flex; gap: 5px; margin-bottom: 5px; }
@@ -146,17 +145,11 @@
 const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]},{u:"Grenoble", v:"Valence", cost:2, col:["jaune"]},];
 
 const MISSIONS_3 = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
-
 const MISSIONS_4 = [{s:"Calais",e:"Mulhouse",w:19},{s:"Douai",e:"Brest",w:19},{s:"Amiens",e:"Bordeaux",w:19},{s:"Mulhouse",e:"Toulon",w:19},{s:"Poitiers",e:"Toulon",w:19},{s:"Bordeaux",e:"Rouen",w:19},{s:"Perpignan",e:"Tours",w:19},{s:"Montbéliard",e:"Bordeaux",w:19}];
-
-const MISSIONS_5 = 
-[{s:"Brest",e:"Nancy",w:25},{s:"Nice",e:"Nantes",w:26},{s:"Calais",e:"Clermont-Ferrand",w:24},{s:"Nice",e:"Strasbourg",w:25},{s:"Dijon",e:"Bayonne",w:25}, {s:"Mulhouse",e:"Saint-Nazaire",w:25},{s:"Amiens",e:"Toulouse",w:25}];
+const MISSIONS_5 = [{s:"Brest",e:"Nancy",w:25},{s:"Nice",e:"Nantes",w:26},{s:"Calais",e:"Clermont-Ferrand",w:24},{s:"Nice",e:"Strasbourg",w:25},{s:"Dijon",e:"Bayonne",w:25}, {s:"Mulhouse",e:"Saint-Nazaire",w:25},{s:"Amiens",e:"Toulouse",w:25}];
 
 let state = { scale: 1, color: null, mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, lastGain: 0 };
-
-let timer = null;
-let startTime = 0;
-let currentTime = 0;
+let timer = null, startTime = 0, currentTime = 0;
 
 function formatTime(totalSec) {
     let m = Math.floor(totalSec / 60);
@@ -177,14 +170,10 @@ function setupCities() {
 }
 
 function startGame() {
-    let names = Array.from(document.querySelectorAll('.input-names'));
-    let mins = Array.from(document.querySelectorAll('.input-min'));
-    let secs = Array.from(document.querySelectorAll('.input-sec'));
+    let names = Array.from(document.querySelectorAll('.input-names')), mins = Array.from(document.querySelectorAll('.input-min')), secs = Array.from(document.querySelectorAll('.input-sec'));
     let validCount = 0;
     names.forEach((inp, i) => {
-        let name = inp.value.trim();
-        let m = parseInt(mins[i].value) || 0;
-        let s = parseInt(secs[i].value) || 0;
+        let name = inp.value.trim(), m = parseInt(mins[i].value) || 0, s = parseInt(secs[i].value) || 0;
         let totalSec = (m * 60) + s;
         if(name !== "" && totalSec > 0) {
             state.individual[clean(name)] = { dist: 0, target: totalSec, realName: name };
@@ -195,15 +184,14 @@ function startGame() {
     state.color = document.getElementById('team-color').value;
     let pool = (validCount >= 5) ? MISSIONS_5 : (validCount === 4 ? MISSIONS_4 : MISSIONS_3);
     let m = pool[Math.floor(Math.random()*pool.length)];
-    state.mission = {s: m.s, e: m.e};
-    state.targetWagons = m.w;
+    state.mission = {s: m.s, e: m.e}; state.targetWagons = m.w;
     setupCities(); showScreen('screen-game'); saveGame(); updateUI();
 }
 
 function updateUI() {
     document.getElementById('deco-top').className = "card deco-card " + state.color;
     document.getElementById('deco-bottom').className = "card deco-card " + state.color;
-    let sc = document.getElementById('team-score-card'); sc.className = "card " + state.color;
+    document.getElementById('team-score-card').className = "card " + state.color;
     document.getElementById('dist-team').innerText = state.distance + " m";
     document.getElementById('m-title').innerText = "📍 MISSION : " + state.mission.s + " ➔ " + state.mission.e;
     let curW = state.built.reduce((acc, b) => { 
@@ -217,9 +205,8 @@ function updateUI() {
     for(let n in state.individual) {
         let pData = state.individual[n];
         let r = document.createElement('div'); r.className='player-row'; 
-        let m = Math.floor(pData.target/60); let s = pData.target%60;
-        let targetDisp = m + ":" + s.toString().padStart(2,'0');
-        r.innerHTML=`<div><span>${pData.realName}</span><br><small>Cible: ${targetDisp}</small></div><span>${pData.dist}m</span>`;
+        let m = Math.floor(pData.target/60), s = pData.target%60;
+        r.innerHTML=`<div><span>${pData.realName}</span><br><small>Cible: ${m}:${s.toString().padStart(2,'0')}</small></div><span>${pData.dist}m</span>`;
         r.onclick=()=>askValidation(n); pl.appendChild(r);
     }
     let iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
@@ -228,16 +215,13 @@ function updateUI() {
 }
 
 function askValidation(name) {
-    state.currentPlayer = name;
-    state.currentPin = Math.floor(100 + Math.random() * 899);
-    let pData = state.individual[name];
-    let m = Math.floor(pData.target/60); let s = pData.target%60;
+    state.currentPlayer = name; state.currentPin = Math.floor(100 + Math.random() * 899);
+    let pData = state.individual[name], m = Math.floor(pData.target/60), s = pData.target%60;
     document.getElementById('target-display').innerText = "Cible : " + m + ":" + s.toString().padStart(2,'0');
     document.getElementById('chrono-display').innerText = "0:00.0";
     document.getElementById('btn-chrono-toggle').innerText = "DÉPART";
     document.getElementById('btn-chrono-toggle').style.background = "var(--p)";
     document.getElementById('qr-success-zone').style.display = "none";
-    document.getElementById('qr-error-msg').style.display = "none";
     document.getElementById('chrono-zone').style.display = "block";
     document.getElementById('qr-title').innerText = "Course de " + pData.realName;
     document.getElementById('modal-qr').style.display = 'flex';
@@ -270,16 +254,7 @@ function verifyTime() {
 function generateQRCode(real, target, gain) {
     const rid = state.currentPlayer + "_" + Date.now();
     document.getElementById('display-id').innerText = rid;
-    const data = { 
-        team: state.color, 
-        player: state.individual[state.currentPlayer].realName, 
-        dist: state.distance + 250, 
-        pin: state.currentPin, 
-        id: rid,
-        tempsRealise: real.toFixed(1),
-        tempsCible: target,
-        wagonsGagnes: gain
-    };
+    const data = { team: state.color, player: state.individual[state.currentPlayer].realName, dist: state.distance + 250, pin: state.currentPin, id: rid, tempsRealise: real.toFixed(1), tempsCible: target, wagonsGagnes: gain };
     document.getElementById('qrcode').innerHTML = "";
     new QRCode(document.getElementById("qrcode"), { text: JSON.stringify(data), width: 180, height: 180 });
     document.getElementById('chrono-zone').style.display = "none";
@@ -310,17 +285,31 @@ function showChanceModal(rem) {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
-    
-    // ... (vérifications villes identiques et rail déjà posé) ...
+    if (a === b) return alert("Villes identiques");
+    let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
+    if(!r) return alert("Liaison absente !");
+    if(state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b))) return alert("Déjà posé !");
 
     const coutTotal = parseInt(r.cost);
-    let paiement = {};
-    let totalSaisi = 0;
+    let paiement = {}, totalSaisi = 0;
 
-    // C'EST CETTE BOUCLE QUI DOIT REMPLACER L'ANCIEN PROMPT
     for (let i = 0; i < r.col.length; i++) {
-        let couleur = r.col[i];
-        // ... le reste du code avec le prompt spécifique par couleur ...
+        let couleur = r.col[i], stock = state.inv[couleur] || 0, reste = coutTotal - totalSaisi;
+        if (reste > 0) {
+            let reponse = prompt(`Route vers ${b} (Coût: ${coutTotal})\nCouleur: ${couleur.toUpperCase()} (Stock: ${stock})\nCombien de wagons ?`, Math.min(stock, reste));
+            if (reponse === null) return;
+            let n = parseInt(reponse) || 0;
+            if (n > stock) { alert(`Stock insuffisant en ${couleur}`); return; }
+            paiement[couleur] = n; totalSaisi += n;
+        }
+    }
+
+    if (totalSaisi === coutTotal) {
+        for (let c in paiement) state.inv[c] -= paiement[c];
+        state.built.push({u: a, v: b}); saveGame(); updateUI(); checkWin();
+        alert("Route construite !");
+    } else alert(`Paiement incorrect (${totalSaisi}/${coutTotal})`);
+}
 
 function checkWin() {
     let v = new Set(), q = [state.mission.s];

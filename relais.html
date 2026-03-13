@@ -16,7 +16,6 @@
         .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
         .player-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; border: 1px solid #ddd; font-weight: bold; }
         
-        /* Alignement Setup une ligne */
         .setup-row { display: flex; gap: 5px; margin-bottom: 8px; align-items: center; background: #fff; padding: 5px; border-radius: 6px; border: 1px solid #eee; }
         .input-names { flex: 3; min-width: 0; }
         .input-sex { flex: 1; min-width: 50px; }
@@ -207,7 +206,6 @@
     </div>
 
 <script>
-// Logique inchangée pour garantir la fiabilité
 const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune", "bleu"]},{u:"Grenoble", v:"Valence", cost:2, col:["jaune"]},];
 
 const MISSIONS = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16},{s:"Lorient",e:"Amiens",w:16},{s:"Montbéliard",e:"Marseille",w:16},{s:"Bayonne",e:"Marseille",w:16},{s:"Nîmes",e:"Poitiers",w:16},{s:"Tours",e:"Toulouse",w:16},{s:"Saint-Nazaire",e:"Pau",w:16}];
@@ -223,17 +221,15 @@ let setupTimerInterval = null, setupStartTime = 0, currentSetupIndex = null;
 
 function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function saveGame() { localStorage.setItem('rf_v40_final', JSON.stringify(state)); }
-function checkSave() { let s = localStorage.getItem('rf_v40_final'); if(s) { state = JSON.parse(s); setupCities(); showScreen('screen-game'); updateUI(); } }
+function saveGame() { localStorage.setItem('rf_v50_final', JSON.stringify(state)); }
+function checkSave() { let s = localStorage.getItem('rf_v50_final'); if(s) { state = JSON.parse(s); setupCities(); showScreen('screen-game'); updateUI(); } }
 function resetGame() { if(confirm("Supprimer toute la progression ?")) { localStorage.clear(); location.reload(); } }
 
 function getNoteRepere(temps, sexe) {
     if(!temps || temps <= 0) return "--";
     let bar = (sexe === "F") ? B_F : B_G;
     let note = 0;
-    for (let i = bar.length - 1; i >= 0; i--) {
-        if (parseFloat(temps) <= bar[i]) { note = POINTS[i]; break; }
-    }
+    for (let i = bar.length - 1; i >= 0; i--) { if (parseFloat(temps) <= bar[i]) { note = POINTS[i]; break; } }
     return note.toFixed(2);
 }
 
@@ -252,15 +248,11 @@ function handleSetupChronoClick() {
     const btn = document.getElementById('btn-setup-chrono-main');
     if (btn.innerText === "DÉPART") {
         setupStartTime = Date.now();
-        btn.innerText = "STOP";
-        btn.classList.add('stop');
-        setupTimerInterval = setInterval(() => {
-            document.getElementById('setup-chrono-display').innerText = ((Date.now() - setupStartTime) / 1000).toFixed(2);
-        }, 50);
+        btn.innerText = "STOP"; btn.classList.add('stop');
+        setupTimerInterval = setInterval(() => { document.getElementById('setup-chrono-display').innerText = ((Date.now() - setupStartTime) / 1000).toFixed(2); }, 50);
     } else {
         clearInterval(setupTimerInterval);
-        btn.innerText = "DÉPART";
-        btn.classList.remove('stop');
+        btn.innerText = "DÉPART"; btn.classList.remove('stop');
         document.getElementById('btn-setup-chrono-confirm').style.display = "block";
     }
 }
@@ -271,10 +263,7 @@ function confirmSetupChrono() {
     closeSetupChrono();
 }
 
-function closeSetupChrono() {
-    clearInterval(setupTimerInterval);
-    document.getElementById('modal-setup-chrono').style.display = "none";
-}
+function closeSetupChrono() { clearInterval(setupTimerInterval); document.getElementById('modal-setup-chrono').style.display = "none"; }
 
 function updateBanners() {
     const colSelect = document.getElementById('team-color').value;
@@ -323,9 +312,7 @@ function calculateNote(temps, playersKeys) {
     let nomBareme = nbFilles + "Filles";
     let baremeChoisi = BAREMES[nomBareme];
     let note = 0;
-    for (let i = baremeChoisi.length - 1; i >= 0; i--) {
-        if (temps <= baremeChoisi[i]) { note = POINTS[i]; break; }
-    }
+    for (let i = baremeChoisi.length - 1; i >= 0; i--) { if (temps <= baremeChoisi[i]) { note = POINTS[i]; break; } }
     return note.toFixed(2);
 }
 
@@ -344,16 +331,17 @@ function updateUI() {
         let badgeLetter = p.letter.replace(/[12]/g, '');
         let sexe = p.letter.includes("2") ? "F" : "G";
         let nRep = getNoteRepere(p.target, sexe);
-        pl.innerHTML += `<div class="player-row">
-            <div><span class="id-badge">${badgeLetter}</span><span>${p.realName}</span><br><small>Réf: ${p.target}s <span class="note-repere">(${nRep}/6)</span></small>${idx!==-1?`<span class="order-badge">${idx+1}</span>`:''}</div>
-            <input type="checkbox" class="chk-relais" ${idx!==-1?'checked':''} onchange="handlePlayerSelect(this, '${n}')">
-        </div>`;
+        pl.innerHTML += `<div class="player-row"><div><span class="id-badge">${badgeLetter}</span><span>${p.realName}</span><br><small>Réf: ${p.target}s <span class="note-repere">(${nRep}/6)</span></small>${idx!==-1?`<span class="order-badge">${idx+1}</span>`:''}</div><input type="checkbox" class="chk-relais" ${idx!==-1?'checked':''} onchange="handlePlayerSelect(this, '${n}')"></div>`;
     }
     let iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
     for(let c in state.inv) if(state.inv[c]>0) iz.innerHTML += `<div class="wagon-pill ${c}">${state.inv[c]}</div>`;
 
     document.getElementById('relais-table-body').innerHTML = state.relaisHistory.map(h => `<tr><td><b>${h.names.replace(/[12-]/g, '')}</b></td><td>${h.theo}s</td><td>${h.real}s</td><td>${h.note}/6</td></tr>`).reverse().join('');
-    document.getElementById('rail-table-body').innerHTML = state.built.map(r => `<tr><td>${r.h}</td><td>${r.u} ↔ ${r.v}</td><td><div class="wagon-pill ${r.col}" style="padding:4px 8px; font-size:0.7rem;">${r.cost}</div></td></tr>`).reverse().join('');
+    
+    document.getElementById('rail-table-body').innerHTML = state.built.map(r => {
+        let pastilles = (r.details || []).map(d => `<div class="wagon-pill ${d.col}" style="padding:2px 6px; font-size:0.7rem; margin:1px;">${d.qte}</div>`).join('');
+        return `<tr><td>${r.h}</td><td>${r.u} ↔ ${r.v}</td><td><div style="display:flex; flex-wrap:wrap; justify-content:center;">${pastilles}</div></td></tr>`;
+    }).reverse().join('');
 }
 
 function askValidation() {
@@ -386,6 +374,8 @@ function toggleChrono() {
     }
 }
 
+function closeModalQR() { clearInterval(timer); timer = null; document.getElementById('modal-qr').style.display = 'none'; }
+
 function checkPin() {
     if(parseInt(document.getElementById('input-pin').value) === state.currentPin) {
         state.distance += 200;
@@ -393,8 +383,7 @@ function checkPin() {
         state.relaisHistory.push({ names: state.selectedRelayers.map(n => state.individual[n].letter).join('-'), theo: state.currentTheorique, real: currentTime, note: noteObtenue });
         let diff = state.currentTheorique - currentTime;
         if(diff < -0.2) state.pendingWagons = 1; else if(diff <= 0.2) state.pendingWagons = 1; else if(diff < 1.0) state.pendingWagons = 2; else if(diff < 1.3) state.pendingWagons = 3; else if(diff < 1.9) state.pendingWagons = 4; else state.pendingWagons = 5;
-        document.getElementById('modal-qr').style.display = 'none';
-        document.getElementById('input-pin').value = "";
+        document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = "";
         showChanceModal(); saveGame(); updateUI();
     } else alert("PIN incorrect");
 }
@@ -414,25 +403,68 @@ function showChanceModal() {
 
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
+    if (a === b) return alert("Villes identiques");
     
-    // ... (vérifications villes identiques et rail déjà posé) ...
+    let r = RAIL_DATA.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b));
+    if(!r) return alert("Liaison absente !");
+    if(state.built.find(x => (x.u === a && x.v === b) || (x.v === a && x.u === b))) return alert("Déjà posé !");
 
     const coutTotal = parseInt(r.cost);
-    let paiement = {};
-    let totalSaisi = 0;
+    let paiement = {}, totalSaisi = 0;
 
-    // C'EST CETTE BOUCLE QUI DOIT REMPLACER L'ANCIEN PROMPT
-    for (let i = 0; i < r.col.length; i++) {
-        let couleur = r.col[i];
-        // ... le reste du code avec le prompt spécifique par couleur ...
+    let couleursPossibles = (r.col && r.col.length > 0) ? r.col : Object.keys(state.inv);
+
+    for (let couleur of couleursPossibles) {
+        let stock = state.inv[couleur] || 0;
+        let reste = coutTotal - totalSaisi;
+        if (reste > 0 && stock > 0) {
+            let reponse = prompt(`Route ${a} ↔ ${b} (Coût: ${coutTotal})\nUtiliser quelle quantité de ${couleur.toUpperCase()} ? (Stock: ${stock})`, Math.min(stock, reste));
+            if (reponse === null) return; 
+            let n = parseInt(reponse) || 0;
+            if (n > stock) { alert(`Stock insuffisant en ${couleur}`); return; }
+            if (n > 0) {
+                paiement[couleur] = n;
+                totalSaisi += n;
+            }
+        }
+    }
+
+    if (totalSaisi < coutTotal) {
+        alert(`Paiement incomplet (${totalSaisi}/${coutTotal}). Choisissez d'autres couleurs.`);
+        for (let couleur in state.inv) {
+            if (paiement[couleur]) continue; 
+            let stock = state.inv[couleur] || 0;
+            let reste = coutTotal - totalSaisi;
+            if (reste > 0 && stock > 0) {
+                let reponse = prompt(`Compléter avec ${couleur.toUpperCase()} ? (Stock: ${stock})`, Math.min(stock, reste));
+                if (reponse === null) break;
+                let n = parseInt(reponse) || 0;
+                paiement[couleur] = (paiement[couleur] || 0) + n;
+                totalSaisi += n;
+                if (totalSaisi >= coutTotal) break;
+            }
+        }
+    }
+
+    if (totalSaisi === coutTotal) {
+        let detailCouleurs = [];
+        for (let c in paiement) {
+            state.inv[c] -= paiement[c];
+            if (paiement[c] > 0) detailCouleurs.push({ col: c, qte: paiement[c] });
+        }
+        state.built.push({ 
+            h: new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}), 
+            u: a, v: b, cost: coutTotal, details: detailCouleurs 
+        });
+        saveGame(); updateUI(); checkWin(); alert("Route construite !");
+    } else alert(`Action annulée : paiement incorrect (${totalSaisi}/${coutTotal} wagons).`);
+}
 
 function checkWin() {
     let v = new Set(), q = [state.mission.s];
     while(q.length > 0) {
         let curr = q.shift(); if(curr === state.mission.e) { document.getElementById('modal-win').style.display='flex'; return; }
-        v.add(curr); state.built.forEach(r => { 
-            if(r.u==curr && !v.has(r.v)) q.push(r.v); if(r.v==curr && !v.has(r.u)) q.push(r.u); 
-        });
+        v.add(curr); state.built.forEach(r => { if(r.u==curr && !v.has(r.v)) q.push(r.v); if(r.v==curr && !v.has(r.u)) q.push(r.u); });
     }
 }
 
@@ -442,9 +474,7 @@ function startSecondaryMission() {
     document.getElementById('modal-win').style.display='none';
     saveGame(); updateUI();
 }
-
 function zoomMap(v) { state.scale += v; document.getElementById('map-container').style.transform = `scale(${state.scale})`; }
-function closeModalQR() { clearInterval(timer); timer = null; document.getElementById('modal-qr').style.display = 'none'; }
 </script>
 </body>
 </html>
