@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Les aventuriers du rail - Précision Cible V6.0</title>
+    <title>Les aventuriers du rail - Précision Cible V5.0</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --b: #3498db; }
@@ -13,13 +13,9 @@
         .active { display: flex; }
         .padding { padding: 15px; }
         .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
-        .player-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; cursor: pointer; border: 1px solid #ddd; font-weight: bold; }
-        .player-info { display: flex; flex-direction: column; }
-        .player-targets { font-size: 0.75rem; color: #666; font-weight: normal; margin-top: 2px; }
+        .player-row { display: flex; justify-content: space-between; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; cursor: pointer; border: 1px solid #ddd; font-weight: bold; }
         .inventory { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
         .wagon-pill { padding: 8px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #333; }
-        .wagon-mini { padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; margin-left: 3px; display: inline-block; border: 1px solid #333; font-weight: bold; }
-        
         .prog-container { background: #eee; border-radius: 10px; height: 18px; overflow: hidden; margin: 8px 0; border: 1px solid #ccc; }
         .prog-bar { background: var(--b); height: 100%; width: 0%; transition: width 0.5s ease; }
         #map-area { background: #cbdceb; flex-grow: 1; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; }
@@ -52,19 +48,34 @@
         .player-setup-row div { flex: 1; display: flex; align-items: center; gap: 2px; }
         .player-setup-row input[type="number"] { width: 100%; margin: 0; padding: 8px; }
         .target-reminder { background: #fff3cd; padding: 10px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 15px; font-weight: bold; color: #856404; }
-        .resultat-flash { font-size: 1.4rem; color: var(--p); font-weight: 900; background: #e8f4fd; padding: 5px; border-radius: 5px; margin-bottom: 10px; }
     </style>
 </head>
 <body onload="checkSave()">
 
     <div id="screen-setup" class="screen active padding">
-        <h2 style="text-align: center;">🚂 Les aventuriers du rail V6.0</h2>
+        <h2 style="text-align: center;">🚂 Les aventuriers du rail V5.0</h2>
+        <p style="font-size: 0.8rem; text-align: center;">Prénom | Temps cible sur 250m (min:sec)</p>
         <div id="names-inputs">
-            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div></div>
-            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div></div>
-            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div></div>
-            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div></div>
-            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div></div>
+            <div class="player-setup-row">
+                <input type="text" class="in-n" placeholder="Prénom">
+                <div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div>
+            </div>
+            <div class="player-setup-row">
+                <input type="text" class="in-n" placeholder="Prénom">
+                <div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div>
+            </div>
+            <div class="player-setup-row">
+                <input type="text" class="in-n" placeholder="Prénom">
+                <div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div>
+            </div>
+            <div class="player-setup-row">
+                <input type="text" class="in-n" placeholder="Prénom">
+                <div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div>
+            </div>
+            <div class="player-setup-row">
+                <input type="text" class="in-n" placeholder="Prénom">
+                <div><input type="number" class="in-m" placeholder="min">:<input type="number" class="in-s" placeholder="sec"></div>
+            </div>
         </div>
         <select id="team-color" style="margin-top:15px;">
             <option value="rouge">🔴 Rouge</option><option value="bleu">🔵 Bleue</option><option value="vert">🟢 Verte</option>
@@ -87,7 +98,7 @@
             <select id="sel-a"></select> vers <select id="sel-b"></select>
             <button class="btn-valid" onclick="buildRoute()">Valider la construction</button>
         </div>
-        <div class="card"><h4 style="margin:0">📜 Historique</h4><ul id="trajet-list-ul" style="font-size: 0.85rem; padding-left: 20px; list-style-type: none;"></ul></div>
+        <div class="card"><h4 style="margin:0">📜 Historique</h4><ul id="trajet-list-ul" style="font-size: 0.85rem; padding-left: 20px;"></ul></div>
         <button onclick="resetGame()" style="background:var(--d); color:white; border:none; margin-top:30px; padding:8px; font-size:0.7rem; opacity:0.8;">RÉINITIALISER TOUTE LA PARTIE</button>
     </div>
 
@@ -116,7 +127,6 @@
                 <button id="btn-chrono-toggle" class="btn-valid" onclick="toggleChrono()">DÉPART</button>
             </div>
             <div id="qr-success-zone" style="display:none;">
-                <div class="resultat-flash">TEMPS : <span id="final-chrono-result">0:00.0</span></div>
                 <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
                 <p style="font-size:0.7rem; color:#666;">ID : <span id="display-id"></span></p>
                 <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
@@ -126,85 +136,102 @@
         </div>
     </div>
 
-    <div id="modal-chance" class="modal"><div class="modal-content"><h2 id="chance-title">Bravo !</h2><p id="chance-info" style="font-size:0.9rem; color:var(--p);"></p><p id="chance-txt">Choisis tes wagons :</p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
+    <div id="modal-chance" class="modal">
+        <div class="modal-content">
+            <h2 id="chance-title">Bravo !</h2>
+            <p id="chance-info" style="font-size:0.9rem; color:var(--p);"></p>
+            <p id="chance-txt">Choisis tes wagons :</p>
+            <div id="chance-buttons" class="inventory" style="justify-content:center"></div>
+        </div>
+    </div>
+    
     <div id="modal-win" class="modal"><div class="modal-content" style="background:#f1c40f;"><h1>🏆 VICTOIRE !</h1><p>Mission principale terminée !</p><button class="btn-valid" onclick="startSecondaryMission()">MISSION SECONDAIRE</button></div></div>
 
 <script>
 const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune","bleu"]},{u:"Grenoble",v:"Valence",cost:2,col:["jaune"]}];
+
 const MISSIONS_3 = [{s:"Calais",e:"Troyes",w:13},{s:"Béthune",e:"Tours",w:13},{s:"Brest",e:"Le Havre",w:13}];
 const MISSIONS_4 = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16}];
 const MISSIONS_5 = [{s:"Calais",e:"Mulhouse",w:19},{s:"Douai",e:"Brest",w:19}];
+
 let state = { scale: 1, color: 'rouge', mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, currentDist: 250 };
 let timer = null, startTime = 0, currentTime = 0;
+
 function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
 function formatTime(ts) { let m=Math.floor(ts/60), s=(ts%60).toFixed(1); return m+":"+s.padStart(4,'0'); }
 function formatMMSS_Short(ts) { let m=Math.floor(ts/60), s=Math.floor(ts%60); return m+":"+s.toString().padStart(2,'0'); }
+
 function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function saveGame() { localStorage.setItem('rail_v5_cible', JSON.stringify(state)); }
 function checkSave() { let s=localStorage.getItem('rail_v5_cible'); if(s) { state=JSON.parse(s); setupCities(); showScreen('screen-game'); updateUI(); } }
 function resetGame() { if(confirm("Réinitialiser ?")) { localStorage.removeItem('rail_v5_cible'); location.reload(); } }
+
 function setupCities() {
     let cities = [...new Set(RAIL_DATA.flatMap(r => [r.u, r.v]))].sort();
     let sa = document.getElementById('sel-a'), sb = document.getElementById('sel-b');
     sa.innerHTML = sb.innerHTML = ""; cities.forEach(c => { sa.add(new Option(c,c)); sb.add(new Option(c,c)); });
 }
+
 function startGame() {
     let names = document.querySelectorAll('.in-n'), mins = document.querySelectorAll('.in-m'), secs = document.querySelectorAll('.in-s');
-    state.individual = {}; let count = 0;
+    state.individual = {};
+    let count = 0;
     names.forEach((n, i) => {
         let val = n.value.trim();
         if(val !== "") {
             let t = (parseInt(mins[i].value)||0)*60 + (parseInt(secs[i].value)||0);
-            state.individual[val] = { dist: 0, target250: t }; count++;
+            state.individual[val] = { dist: 0, target250: t };
+            count++;
         }
     });
-    if(!count) return alert("Entrez au moins un nom.");
+    if(!count) return alert("Entrez au moins un nom et un temps cible.");
     state.color = document.getElementById('team-color').value;
     let pool = (count >= 5) ? MISSIONS_5 : (count === 4 ? MISSIONS_4 : MISSIONS_3);
     let m = pool[Math.floor(Math.random()*pool.length)];
     state.mission = {s: m.s, e: m.e}; state.targetWagons = m.w;
     setupCities(); showScreen('screen-game'); saveGame(); updateUI();
 }
+
 function startSecondaryMission() {
     let m = MISSIONS_3[Math.floor(Math.random()*MISSIONS_3.length)];
     state.mission = {s: m.s, e: m.e}; state.targetWagons += m.w;
     document.getElementById('modal-win').style.display = 'none';
     saveGame(); updateUI();
 }
+
 function updateUI() {
     document.getElementById('deco-top').className = "card " + state.color;
     document.getElementById('team-score-card').className = "card " + state.color;
     document.getElementById('dist-team').innerText = state.distance + " m";
     document.getElementById('m-title').innerText = "📍 " + state.mission.s + " ➔ " + state.mission.e;
-    let curW = state.built.reduce((acc, b) => acc + (b.cost || 0), 0);
+    let curW = state.built.reduce((acc, b) => { let r = RAIL_DATA.find(rd => (rd.u==b.u && rd.v==b.v) || (rd.v==b.u && rd.u==b.v)); return acc + (r ? r.cost : 0); }, 0);
     let p = Math.min(100, Math.round((curW/state.targetWagons)*100));
     document.getElementById('mission-progress-bar').style.width = p + "%";
     document.getElementById('mission-progress-text').innerText = `${curW} / ${state.targetWagons} wagons (${p}%)`;
     let pl = document.getElementById('players-list'); pl.innerHTML = "";
     for(let n in state.individual) {
         let r = document.createElement('div'); r.className='player-row';
-        let t250 = state.individual[n].target250;
-        r.innerHTML=`<div class="player-info"><span>${n}</span><span class="player-targets">Cibles: 250m (${formatMMSS_Short(t250)}) / 500m (${formatMMSS_Short(t250*2)})</span></div><span>${state.individual[n].dist}m</span>`;
+        r.innerHTML=`<span>${n}</span><span>${state.individual[n].dist}m</span>`;
         r.onclick=()=>askValidation(n); pl.appendChild(r);
     }
     let iz = document.getElementById('inventory-zone'); iz.innerHTML = "";
     for(let c in state.inv) if(state.inv[c]>0) iz.innerHTML += `<div class="wagon-pill ${c}">${state.inv[c]}</div>`;
-    document.getElementById('trajet-list-ul').innerHTML = state.built.map(r => {
-        let pastilles = ""; if(r.paiement) { for(let color in r.paiement) if(r.paiement[color] > 0) pastilles += `<span class="wagon-mini ${color}">${r.paiement[color]}</span>`; }
-        return `<li style="margin-bottom:8px;">${r.u} ↔ ${r.v} : ${pastilles}</li>`;
-    }).reverse().join('');
+    document.getElementById('trajet-list-ul').innerHTML = state.built.map(r => `<li>${r.u} ↔ ${r.v}</li>`).reverse().join('');
 }
+
 function setDist(d) {
     state.currentDist = d;
     document.getElementById('btn-250').classList.toggle('selected', d===250);
     document.getElementById('btn-500').classList.toggle('selected', d===500);
     updateTargetReminder();
 }
+
 function updateTargetReminder() {
     let base = state.individual[state.currentPlayer].target250;
     let val = (state.currentDist === 500) ? base * 2 : base;
     document.getElementById('target-time-text').innerText = formatMMSS_Short(val);
 }
+
 function askValidation(name) {
     state.currentPlayer = name; state.currentPin = Math.floor(100 + Math.random() * 899);
     currentTime = 0; document.getElementById('chrono-display').innerText = "0:00.0";
@@ -212,8 +239,10 @@ function askValidation(name) {
     document.getElementById('qr-success-zone').style.display = "none";
     document.getElementById('chrono-setup-zone').style.display = "block";
     document.getElementById('qr-title').innerText = name;
-    setDist(250); document.getElementById('modal-qr').style.display = 'flex';
+    setDist(250);
+    document.getElementById('modal-qr').style.display = 'flex';
 }
+
 function toggleChrono() {
     let btn = document.getElementById('btn-chrono-toggle');
     if(!timer) {
@@ -224,6 +253,7 @@ function toggleChrono() {
         generateQRCode();
     }
 }
+
 function generateQRCode() {
     let baseTarget = state.individual[state.currentPlayer].target250;
     let finalTarget = (state.currentDist === 500) ? baseTarget * 2 : baseTarget;
@@ -231,25 +261,40 @@ function generateQRCode() {
     const dataString = ["v1", state.color, clean(state.currentPlayer), state.currentDist, currentTime.toFixed(1), finalTarget, state.currentPin, rid].join("*");
     document.getElementById('chrono-setup-zone').style.display = "none";
     document.getElementById('qr-success-zone').style.display = "block";
-    document.getElementById('final-chrono-result').innerText = formatTime(currentTime);
     document.getElementById('display-id').innerText = rid;
     const container = document.getElementById('qrcode'); container.innerHTML = "";
     setTimeout(() => { new QRCode(container, { text: dataString, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.L }); }, 50);
 }
+
 function closeModalQR() { clearInterval(timer); timer = null; document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = ""; }
+
 function checkPin() {
     if(parseInt(document.getElementById('input-pin').value) === state.currentPin) {
         state.distance += state.currentDist; state.individual[state.currentPlayer].dist += state.currentDist;
+        
+        // CALCUL DU GAIN SELON L'ÉCART
         let baseT = state.individual[state.currentPlayer].target250;
         let target = (state.currentDist === 500) ? baseT * 2 : baseT;
-        let diff = Math.abs(currentTime - target), nbW = 1;
-        if(state.currentDist === 250) { if(diff < 1.5) nbW = 3; else if(diff <= 2.5) nbW = 2; else nbW = 1; }
-        else { if(diff < 3) nbW = 6; else if(diff <= 5) nbW = 4; else nbW = 2; }
+        let diff = Math.abs(currentTime - target);
+        let nbW = 1;
+
+        if(state.currentDist === 250) {
+            if(diff < 1.5) nbW = 3;
+            else if(diff <= 2.5) nbW = 2;
+            else nbW = 1;
+        } else { // 500m
+            if(diff < 3) nbW = 6;
+            else if(diff <= 5) nbW = 4;
+            else nbW = 2;
+        }
+
         closeModalQR();
         document.getElementById('chance-info').innerHTML = `Temps : ${formatTime(currentTime)} (Cible: ${formatTime(target)})<br>Écart : <b>${diff.toFixed(1)}s</b>`;
-        showChanceModal(nbW); saveGame(); updateUI();
+        showChanceModal(nbW); 
+        saveGame(); updateUI();
     } else alert("Code incorrect");
 }
+
 function showChanceModal(rem) {
     if (rem <= 0) { document.getElementById('modal-chance').style.display = "none"; return; }
     let cs = ['jaune','orange','rose','noire','vert','bleu','rouge','blanc'], pk = cs.sort(()=>0.5-Math.random()).slice(0,4);
@@ -262,6 +307,7 @@ function showChanceModal(rem) {
     });
     document.getElementById('modal-chance').style.display = "flex";
 }
+
 function buildRoute() {
     let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value;
     let r = RAIL_DATA.find(x => (x.u===a && x.v===b) || (x.v===a && x.u===b));
@@ -271,17 +317,17 @@ function buildRoute() {
         let stockDispo = state.inv[couleur] || 0, resteAFournir = coutTotal - totalSaisi;
         if (resteAFournir > 0) {
             let n = prompt(`Besoin de ${coutTotal} wagons. ${couleur.toUpperCase()} (Stock: ${stockDispo}).`, Math.min(stockDispo, resteAFournir));
-            if (n === null) return; n = parseInt(n) || 0; 
-            if (n > stockDispo) { alert(`Erreur : Stock insuffisant.`); return; }
+            if (n === null) return;
+            n = parseInt(n) || 0; if (n > stockDispo) { alert(`Erreur : Stock insuffisant.`); return; }
             paiement[couleur] = n; totalSaisi += n;
         }
     }
     if (totalSaisi === coutTotal) {
         for (let c in paiement) state.inv[c] -= paiement[c];
-        state.built.push({u:a, v:b, cost: coutTotal, paiement: paiement}); 
-        saveGame(); updateUI(); checkWin(); alert("Route construite !");
+        state.built.push({u:a, v:b}); saveGame(); updateUI(); checkWin(); alert("Route construite !");
     } else alert("Paiement insuffisant.");
 }
+
 function checkWin() {
     let v = new Set(), q = [state.mission.s];
     while(q.length > 0) {

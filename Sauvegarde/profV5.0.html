@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interface Prof - 1/2 Fond V6.0</title>
+    <title>Interface Prof - 1/2 Fond V5.0</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; background: #f0f2f5; }
@@ -19,6 +19,7 @@
         .chrono-pill { display: inline-block; background: #27ae60; color: white; padding: 2px 6px; border-radius: 4px; margin: 2px; font-weight: bold; font-size: 0.8rem; }
         .cible-badge { background: #3498db; color: white; padding: 3px 6px; border-radius: 4px; font-weight: bold; }
         
+        /* Badges de couleur d'équipe */
         .team-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; color: white; text-transform: uppercase; margin-top: 4px; }
         .rouge { background: #DC143C; }
         .bleu { background: #1E90FF; }
@@ -69,7 +70,6 @@
 let html5QrCode = null, donneesScan = null, scores = {}, idsScannes = new Set();
 
 function formatMMSS(seconds) {
-    if (!seconds || seconds == 0) return "--:--";
     const m = Math.floor(seconds / 60);
     const s = Math.round(seconds % 60);
     return m + ":" + s.toString().padStart(2, '0');
@@ -88,11 +88,11 @@ function sauvegarderDonnees() {
 }
 
 function exporterCSV() {
-    let csv = "\uFEFFRelayeurs;Equipe;Course_N;Distance_Course;Chrono_Relais;Cible_Theorique;Heure_Passage\n";
+    let csv = "\uFEFFRelayeurs;Equipe;Course_N;Chrono_Relais;Cible_Theorique;Heure_Passage\n";
     for (let k in scores) {
         let s = scores[k];
         s.courses.forEach((c, index) => {
-            csv += `"${s.nom}";${s.equipe};${index + 1};${c.distRun};${c.chrono};${s.cible};${c.heure}\n`;
+            csv += `"${s.nom}";${s.equipe};${index + 1};${c.chrono};${s.cible};${c.heure}\n`;
         });
     }
     const b = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -108,28 +108,20 @@ function ouvrirScanner() {
     document.getElementById("modale-scan").style.display = "flex";
     if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
     html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
-        let d = {};
-        if (text.startsWith("v1*")) {
-            const p = text.split("*");
-            d = { team: p[1], player: p[2], distance: parseInt(p[3]), tempsRealise: parseFloat(p[4]), tempsCible: parseFloat(p[5]) || 0, pin: p[6], id: p[7] };
-        } else {
-            try { d = JSON.parse(text); } catch(e) { alert("Format QR inconnu"); return; }
-        }
-
-        if (idsScannes.has(d.id)) { 
-            alert("DÉJÀ VALIDÉ !\nLe code PIN était : " + d.pin); 
-            return; 
-        }
-
-        donneesScan = d;
-        document.getElementById("modale-scan").style.display = "none";
-        document.getElementById("nom-eleve").innerText = d.player;
-        document.getElementById("code-pin").innerText = d.pin;
-        let detail = `Distance: ${d.distance}m | Temps: ${formatMMSS(d.tempsRealise)}`;
-        if (d.tempsCible > 0) detail += ` (Cible: ${formatMMSS(d.tempsCible)})`;
-        document.getElementById("detail-perf").innerText = detail;
-        document.getElementById("modale-validation").style.display = "flex";
-        html5QrCode.stop();
+        try {
+            let d = JSON.parse(text);
+            if (idsScannes.has(d.id)) { 
+                alert("DÉJÀ VALIDÉ !\nLe code PIN était : " + d.pin); 
+                return; 
+            }
+            donneesScan = d;
+            document.getElementById("modale-scan").style.display = "none";
+            document.getElementById("nom-eleve").innerText = d.player;
+            document.getElementById("code-pin").innerText = d.pin;
+            document.getElementById("detail-perf").innerText = `Temps: ${formatMMSS(d.tempsRealise)} (Cible: ${formatMMSS(d.tempsCible)})`;
+            document.getElementById("modale-validation").style.display = "flex";
+            html5QrCode.stop();
+        } catch(e) { alert("Format QR inconnu"); }
     });
 }
 
@@ -137,11 +129,14 @@ function validerScore() {
     if (!donneesScan) return;
     const key = donneesScan.player + "_" + donneesScan.team;
     const h = new Date().toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'});
-    if (!scores[key]) scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: 0, courses: [] };
-    
-    scores[key].distance += donneesScan.distance || 250;
-    if (donneesScan.tempsCible > 0) scores[key].cible = donneesScan.tempsCible;
-    scores[key].courses.push({ chrono: donneesScan.tempsRealise, distRun: donneesScan.distance || 250, heure: h });
+
+    if (!scores[key]) {
+        scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: donneesScan.tempsCible, courses: [] };
+    }
+
+    scores[key].distance += 250;
+    scores[key].cible = donneesScan.tempsCible;
+    scores[key].courses.push({ chrono: donneesScan.tempsRealise, heure: h });
     
     idsScannes.add(donneesScan.id);
     sauvegarderDonnees(); dessinerTableau();
@@ -152,8 +147,9 @@ function dessinerTableau() {
     let html = "";
     for (let k in scores) {
         let s = scores[k];
-        let chronosHtml = s.courses.map(c => `<span class="chrono-pill">${formatMMSS(c.chrono)} <small>(${c.distRun}m)</small></span>`).join('');
+        let chronosHtml = s.courses.map((c, i) => `<span class="chrono-pill">${formatMMSS(c.chrono)}</span>`).join('');
         let derniereHeure = s.courses.length > 0 ? s.courses[s.courses.length - 1].heure : "---";
+
         html += `<tr>
             <td><strong>${s.nom}</strong><br><span class="team-badge ${s.equipe}">${s.equipe}</span></td>
             <td><strong>${s.distance}m</strong></td>
@@ -165,7 +161,7 @@ function dessinerTableau() {
     document.getElementById("corps-tableau").innerHTML = html;
 }
 
-function fermerTout() { if(html5QrCode) html5QrCode.stop().catch(()=>{}); document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); }
+function fermerTout() { if(html5QrCode) html5QrCode.stop(); document.querySelectorAll('.overlay').forEach(o => o.style.display='none'); }
 </script>
 </body>
 </html>

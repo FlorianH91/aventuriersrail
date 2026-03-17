@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les aventuriers du rail - Performance V6.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --p: #2c3e50; --s: #27ae60; --d: #e74c3c; --b: #3498db; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f0f2f5; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        #deco-top { min-height: 20px; margin-bottom: 10px; }
+        
+        .screen { width: 100%; height: 100vh; display: none; flex-direction: column; overflow-y: auto; }
+        .active { display: flex; }
+        .padding { padding: 15px; }
+        .card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 12px; margin-bottom: 10px; border-left: 5px solid var(--p); }
+        .player-row { display: flex; justify-content: space-between; padding: 15px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; cursor: pointer; border: 1px solid #ddd; font-weight: bold; }
+        .inventory { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+        .wagon-pill { padding: 8px 12px; border-radius: 4px; font-weight: bold; border: 1px solid #333; cursor: pointer; }
+        
+        .rouge { background: #DC143C !important; color: white !important; }
+        .bleu { background: #1E90FF !important; color: white !important; }
+        .vert { background: #2E7D32 !important; color: white !important; }
+        .jaune { background: #FFD700 !important; color: black !important; }
+        .noire { background: #222 !important; color: white !important; }
+        .blanc { background: #fff !important; color: black !important; border: 2px solid #333 !important; }
+        .orange { background: #FF8C00 !important; color: white !important; }
+        .violet { background: #8A2BE2 !important; color: white !important; }
+        .rose { background: #FF69B4 !important; color: white !important; }
+        
+        .prog-container { background: #eee; border-radius: 10px; height: 18px; overflow: hidden; margin: 8px 0; border: 1px solid #ccc; }
+        .prog-bar { background: var(--b); height: 100%; width: 0%; transition: width 0.5s ease; }
+        
+        #chrono-display { font-size: 3.5rem; font-family: monospace; font-weight: bold; margin: 10px 0; color: var(--p); }
+        
+        /* Style de l'encadré bleu pastel pour le résultat final */
+        .resultat-flash {
+            background: #ebf5fb;
+            color: #2c3e50;
+            border: 2px solid #aed6f1;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        #final-chrono-result {
+            display: block;
+            font-size: 3.2rem;
+            font-family: monospace;
+            color: var(--p);
+            margin-top: 5px;
+        }
+
+        .dist-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .dist-btn { flex: 1; padding: 10px; border: 2px solid var(--p); border-radius: 8px; background: white; font-weight: bold; cursor: pointer; }
+        .dist-btn.selected { background: var(--p); color: white; }
+        .history-table { width: 100%; font-size: 0.75rem; border-collapse: collapse; margin-top: 5px; background: #fff; }
+        .history-table th, .history-table td { border: 1px solid #eee; padding: 4px; text-align: center; }
+        #map-area { background: #cbdceb; flex-grow: 1; overflow: auto; position: relative; display: flex; align-items: flex-start; justify-content: center; }
+        #map-container { transform-origin: top center; transition: transform 0.3s ease; }
+        embed { width: 1000px; height: 960px; pointer-events: none; }
+        select, input, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+        .btn-valid { background: var(--s); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-cancel { background: var(--d); color: white; border: none; cursor: pointer; }
+        .btn-nav { background: var(--b); color: white; font-weight: bold; border: none; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 400px; }
+        .player-setup-row { display: flex; gap: 5px; margin-bottom: 5px; }
+    </style>
+</head>
+<body onload="checkSave()">
+
+    <div id="screen-setup" class="screen active padding">
+        <h2 style="text-align: center;">🚂 Les aventuriers du rail V6.0</h2>
+        <div id="names-inputs">
+            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><select class="in-g"><option value="G">G</option><option value="F">F</option></select></div>
+            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><select class="in-g"><option value="G">G</option><option value="F">F</option></select></div>
+            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><select class="in-g"><option value="G">G</option><option value="F">F</option></select></div>
+            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><select class="in-g"><option value="G">G</option><option value="F">F</option></select></div>
+            <div class="player-setup-row"><input type="text" class="in-n" placeholder="Prénom"><select class="in-g"><option value="G">G</option><option value="F">F</option></select></div>
+        </div>
+        <select id="team-color" style="margin-top:15px;">
+            <option value="rouge">🔴 Rouge</option><option value="bleu">🔵 Bleue</option><option value="vert">🟢 Verte</option>
+            <option value="jaune">🟡 Jaune</option><option value="noire">⚫ Noire</option><option value="blanc">⚪ Blanche</option>
+            <option value="orange">🟠 Orange</option><option value="violet">🟣 Violette</option>
+        </select>
+        <button class="btn-valid" onclick="startGame()" style="margin-top:20px;">DÉMARRER LA MISSION</button>
+    </div>
+
+    <div id="screen-game" class="screen padding">
+         <div id="deco-top" class="card" style="min-height:20px;"></div>
+       
+        <button class="btn-nav" onclick="showScreen('screen-map')">🗺️ VOIR LA CARTE</button>
+        <div class="card" style="background:#2c3e50; color:white; text-align:center;"> <span id="m-title">---</span></div>
+        <div id="team-score-card" class="card" style="text-align: center;"><small>SCORE ÉQUIPE :</small><br><strong style="font-size: 2rem;" id="dist-team">0 m</strong></div>
+        <div class="card"><small>PROGRESSION :</small><div class="prog-container"><div id="mission-progress-bar" class="prog-bar"></div></div><div id="mission-progress-text" style="text-align:center; font-size:0.8rem; font-weight:bold;">0 / 0 wagons</div></div>
+        <div id="players-list"></div>
+        <div id="inventory-zone" class="inventory"></div>
+        <div class="card"><h3 style="margin:0">🛤 Poser un rail</h3><select id="sel-a"></select> vers <select id="sel-b"></select><button class="btn-valid" onclick="buildRoute()">Valider la construction</button></div>
+        <div class="card"><h4 style="margin:0">📜 Historique des rails</h4><ul id="trajet-list-ul" style="font-size: 0.85rem; padding-left: 20px;"></ul></div>
+        <button onclick="resetGame()" style="background:var(--d); color:white; border:none; margin:30px 0; padding:8px; font-size:0.7rem; opacity:0.8;">RÉINITIALISER TOUTE LA PARTIE</button>
+    </div>
+
+    <div id="screen-map" class="screen">
+        <button class="btn-nav" style="position:fixed; top:10px; left:10px; z-index:100; width:auto;" onclick="showScreen('screen-game')">⬅ RETOUR</button>
+        <div id="map-area"><div id="map-container"><embed src="carte.svg" type="image/svg+xml"></div></div>
+    </div>
+
+    <div id="modal-qr" class="modal">
+        <div class="modal-content">
+            <h2 id="qr-title">Validation</h2>
+            <div id="chrono-setup-zone">
+                <div class="dist-selector"><button class="dist-btn selected" id="btn-250" onclick="setDist(250)">250m</button><button class="dist-btn" id="btn-500" onclick="setDist(500)">500m</button></div>
+                <div id="chrono-display">0:00.0</div>
+                <button id="btn-chrono-toggle" class="btn-valid" onclick="toggleChrono()">DÉPART</button>
+            </div>
+            <div id="qr-success-zone" style="display:none;">
+                <div class="resultat-flash">
+                    TEMPS : <span id="final-chrono-result">0:00.0</span>
+                </div>
+                <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
+                <p style="font-size:0.7rem; color:#666;">ID : <span id="display-id"></span></p>
+                <input type="number" id="input-pin" style="font-size: 2.5rem; text-align: center;" placeholder="000">
+                <button class="btn-valid" onclick="checkPin()">CONFIRMER LE PIN</button>
+            </div>
+            <button class="btn-cancel" onclick="closeModalQR()" style="margin-top:10px;">FERMER</button>
+        </div>
+    </div>
+
+    <div id="modal-chance" class="modal"><div class="modal-content"><h2>Bravo !</h2><p id="chance-txt"></p><div id="chance-buttons" class="inventory" style="justify-content:center"></div></div></div>
+    <div id="modal-win" class="modal"><div class="modal-content" style="background:#f1c40f;"><h1>🏆 VICTOIRE !</h1><p>Mission principale terminée !</p></div></div>
+
+<script>
+const RAIL_DATA = [{u:"Calais",v:"Dunkerque",cost:1,col:["jaune"]},{u:"Dunkerque",v:"Lille",cost:2,col:["bleu"]},{u:"Dunkerque",v:"Béthune",cost:3,col:["rouge"]},{u:"Béthune",v:"Douai",cost:1,col:["blanc"]},{u:"Douai",v:"Amiens",cost:2,col:["bleu"]},{u:"Douai",v:"Valenciennes",cost:2,col:["noire"]},{u:"Lille",v:"Valenciennes",cost:4,col:["orange"]},{u:"Valenciennes",v:"Thionville",cost:5,col:["noire","rose"]},{u:"Valenciennes",v:"Reims",cost:2,col:["jaune"]},{u:"Amiens",v:"Paris",cost:3,col:["orange","vert"]},{u:"Amiens",v:"Le Havre",cost:4,col:["rouge"]},{u:"Le Havre",v:"Rouen",cost:2,col:["noire"]},{u:"Rouen",v:"Paris",cost:3,col:["blanc"]},{u:"Paris",v:"Troyes",cost:7,col:["rose","jaune"]},{u:"Reims",v:"Nancy",cost:5,col:["rouge"]},{u:"Reims",v:"Troyes",cost:4,col:["vert"]},{u:"Nancy",v:"Troyes",cost:2,col:["bleu"]},{u:"Thionville",v:"Nancy",cost:3,col:["orange"]},{u:"Thionville",v:"Strasbourg",cost:5,col:["rose"]},{u:"Nancy",v:"Strasbourg",cost:4,col:["jaune"]},{u:"Strasbourg",v:"Mulhouse",cost:3,col:["blanc"]},{u:"Mulhouse",v:"Montbéliard",cost:1,col:["vert"]},{u:"Montbéliard",v:"Besançon",cost:2,col:["jaune"]},{u:"Besançon",v:"Troyes",cost:3,col:["rouge","vert"]},{u:"Besançon",v:"Dijon",cost:2,col:["bleu"]},{u:"Besançon",v:"Annecy",cost:4,col:["blanc"]},{u:"Dijon",v:"Lyon",cost:4,col:["jaune","rouge"]},{u:"Le Havre",v:"Caen",cost:1,col:["bleu"]},{u:"Paris",v:"Le Mans",cost:4,col:["vert"]},{u:"Paris",v:"Orléans",cost:4,col:["rouge","bleu"]},{u:"Orléans",v:"Le Mans",cost:3,col:["blanc"]},{u:"Le Mans",v:"Rennes",cost:5,col:["vert"]},{u:"Caen",v:"Le Mans",cost:4,col:["orange"]},{u:"Caen",v:"Rennes",cost:5,col:["blanc","rose"]},{u:"Rennes",v:"Brest",cost:7,col:["rouge"]},{u:"Brest",v:"Lorient",cost:3,col:["orange"]},{u:"Lorient",v:"Saint-Nazaire",cost:3,col:["jaune"]},{u:"Rennes",v:"Saint-Nazaire",cost:3,col:["noire"]},{u:"Rennes",v:"Nantes",cost:3,col:["bleu"]},{u:"Nantes",v:"Saint-Nazaire",cost:2,col:["blanc"]},{u:"Nantes",v:"Angers",cost:2,col:["rouge"]},{u:"Angers",v:"Tours",cost:3,col:["bleu"]},{u:"Tours",v:"Orléans",cost:3,col:["vert"]},{u:"Nantes",v:"Poitiers",cost:5,col:["rose"]},{u:"Tours",v:"Poitiers",cost:2,col:["blanc"]},{u:"Nantes",v:"Bordeaux",cost:8,col:["noire","orange"]},{u:"Poitiers",v:"Limoges",cost:3,col:["rouge"]},{u:"Limoges",v:"Bordeaux",cost:5,col:["vert","bleu"]},{u:"Limoges",v:"Clermont-Ferrand",cost:4,col:["blanc","jaune"]},{u:"Clermont-Ferrand",v:"Lyon",cost:2,col:["orange"]},{u:"Clermont-Ferrand",v:"Saint-Etienne",cost:3,col:["rouge"]},{u:"Lyon",v:"Saint-Etienne",cost:1,col:["vert"]},{u:"Lyon",v:"Grenoble",cost:4,col:["bleu"]},{u:"Grenoble",v:"Annecy",cost:3,col:["vert"]},{u:"Saint-Etienne",v:"Valence",cost:2,col:["noire"]},{u:"Valence",v:"Nîmes",cost:4,col:["rouge","jaune"]},{u:"Nîmes",v:"Montpellier",cost:2,col:["orange","bleu"]},{u:"Nîmes",v:"Marseille",cost:1,col:["blanc","bleu"]},{u:"Marseille",v:"Toulon",cost:2,col:["jaune"]},{u:"Toulon",v:"Nice",cost:3,col:["vert"]},{u:"Montpellier",v:"Toulouse",cost:4,col:["rouge","vert"]},{u:"Toulouse",v:"Perpignan",cost:3,col:["blanc"]},{u:"Toulouse",v:"Pau",cost:5,col:["jaune"]},{u:"Toulouse",v:"Bordeaux",cost:6,col:["rose"]},{u:"Bordeaux",v:"Pau",cost:6,col:["rouge"]},{u:"Pau",v:"Bayonne",cost:4,col:["vert"]},{u:"Orléans",v:"Limoges",cost:7,col:["jaune","bleu"]},{u:"Grenoble",v:"Valence",cost:2,col:["jaune"]}];
+const BAREME_PERF = { "F": { 250: [ {t:105,p:0.3},{t:102,p:0.6},{t:98,p:0.9},{t:94,p:1.2},{t:91,p:1.5},{t:87,p:1.8},{t:83,p:2.1},{t:79,p:2.4},{t:74,p:2.7},{t:70,p:3.0},{t:69,p:3.3},{t:67,p:3.6},{t:66,p:3.9},{t:64,p:4.2},{t:63,p:4.5},{t:61,p:4.8},{t:59,p:5.1},{t:57,p:5.4},{t:54,p:5.7},{t:53,p:6.0} ], 500: [ {t:210,p:0.3},{t:203,p:0.6},{t:196,p:0.9},{t:189,p:1.2},{t:182,p:1.5},{t:175,p:1.8},{t:166,p:2.1},{t:157,p:2.4},{t:148,p:2.7},{t:140,p:3.0},{t:137,p:3.3},{t:134,p:3.6},{t:131,p:3.9},{t:128,p:4.2},{t:125,p:4.5},{t:122,p:4.8},{t:118,p:5.1},{t:113,p:5.4},{t:109,p:5.7},{t:105,p:6.0} ] }, "G": { 250: [ {t:83,p:0.3},{t:80,p:0.6},{t:77,p:0.9},{t:75,p:1.2},{t:72,p:1.5},{t:70,p:1.8},{t:66,p:2.1},{t:63,p:2.4},{t:59,p:2.7},{t:56,p:3.0},{t:54,p:3.3},{t:53,p:3.6},{t:53,p:3.9},{t:51,p:4.2},{t:50,p:4.5},{t:49,p:4.8},{t:47,p:5.1},{t:46,p:5.4},{t:44,p:5.7},{t:42,p:6.0} ], 500: [ {t:165,p:0.3},{t:160,p:0.6},{t:154,p:0.9},{t:149,p:1.2},{t:144,p:1.5},{t:139,p:1.8},{t:132,p:2.1},{t:125,p:2.4},{t:119,p:2.7},{t:112,p:3.0},{t:109,p:3.3},{t:107,p:3.6},{t:105,p:3.9},{t:103,p:4.2},{t:100,p:4.5},{t:98,p:4.8},{t:95,p:5.1},{t:91,p:5.4},{t:88,p:5.7},{t:85,p:6.0} ] } };
+const MISSIONS_3 = [{s:"Calais",e:"Troyes",w:13},{s:"Béthune",e:"Tours",w:13},{s:"Brest",e:"Le Havre",w:13}];
+const MISSIONS_4 = [{s:"Calais",e:"Besançon",w:16},{s:"Dunkerque",e:"Tours",w:16}];
+const MISSIONS_5 = [{s:"Calais",e:"Mulhouse",w:19},{s:"Douai",e:"Brest",w:19}];
+
+let state = { scale: 1, color: 'rouge', mission: null, built: [], distance: 0, inv: {jaune:0,orange:0,rose:0,noire:0,vert:0,bleu:0,rouge:0,blanc:0}, individual: {}, targetWagons: 0, currentPlayer: null, currentPin: null, currentDist: 250 };
+let timer = null, startTime = 0, currentTime = 0;
+
+function clean(s) { return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ''); }
+function formatTime(ts) { let m=Math.floor(ts/60), s=(ts%60).toFixed(1); return m+":"+s.padStart(4,'0'); }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function saveGame() { localStorage.setItem('rail_v6_perf', JSON.stringify(state)); }
+function checkSave() { let s=localStorage.getItem('rail_v6_perf'); if(s) { state=JSON.parse(s); setupCities(); showScreen('screen-game'); updateUI(); } }
+function resetGame() { if(confirm("Effacer ?")) { localStorage.removeItem('rail_v6_perf'); location.reload(); } }
+function setupCities() { let cities = [...new Set(RAIL_DATA.flatMap(r => [r.u, r.v]))].sort(); let sa = document.getElementById('sel-a'), sb = document.getElementById('sel-b'); sa.innerHTML = sb.innerHTML = ""; cities.forEach(c => { sa.add(new Option(c,c)); sb.add(new Option(c,c)); }); }
+
+function startGame() { 
+    let names = document.querySelectorAll('.in-n'), sexs = document.querySelectorAll('.in-g'); state.individual = {}; let count = 0; 
+    names.forEach((n, i) => { if(n.value.trim() !== "") { state.individual[n.value.trim()] = { dist: 0, sex: sexs[i].value, history: [] }; count++; } }); 
+    if(!count) return alert("Nom manquant."); 
+    state.color = document.getElementById('team-color').value; 
+    let pool = (count >= 5) ? MISSIONS_5 : (count === 4 ? MISSIONS_4 : MISSIONS_3); 
+    let m = pool[Math.floor(Math.random()*pool.length)]; 
+    state.mission = {s: m.s, e: m.e}; state.targetWagons = m.w; 
+    setupCities(); showScreen('screen-game'); saveGame(); updateUI(); 
+}
+
+function updateUI() { 
+    document.getElementById('deco-top').className = "card " + state.color; 
+    document.getElementById('team-score-card').className = "card " + state.color; 
+    document.getElementById('dist-team').innerText = state.distance + " m"; 
+    document.getElementById('m-title').innerText = "📍 " + state.mission.s + " ➔ " + state.mission.e; 
+    
+    let curW = state.built.reduce((acc, b) => acc + (b.cost || 0), 0); 
+    let p = Math.min(100, Math.round((curW/state.targetWagons)*100)); 
+    document.getElementById('mission-progress-bar').style.width = p + "%"; 
+    document.getElementById('mission-progress-text').innerText = `${curW} / ${state.targetWagons} wagons`; 
+    
+    let pl = document.getElementById('players-list'); pl.innerHTML = ""; 
+    for(let n in state.individual) { 
+        let pData = state.individual[n]; 
+        let r = document.createElement('div'); r.className='card'; 
+        r.innerHTML=`<div class="player-row" onclick="askValidation('${n}')"><span>${n} (${pData.sex})</span><span>${pData.dist}m</span></div><table class="history-table"><tr><th>D.</th><th>Temps</th><th>Note</th></tr>${pData.history.map(h => `<tr><td>${h.d}m</td><td>${formatTime(h.t)}</td><td><strong>${h.pts}/6</strong></td></tr>`).reverse().join('')}</table>`; 
+        pl.appendChild(r); 
+    } 
+    
+    let iz = document.getElementById('inventory-zone'); iz.innerHTML = ""; 
+    for(let c in state.inv) if(state.inv[c]>0) iz.innerHTML += `<div class="wagon-pill ${c}">${state.inv[c]}</div>`; 
+    
+    document.getElementById('trajet-list-ul').innerHTML = state.built.map(r => {
+        let costHtml = (r.details || []).map(d => `<span class="wagon-pill ${d.col}" style="padding:2px 6px; font-size:0.7rem; margin-left:4px; cursor:default;">${d.qte}</span>`).join('');
+        return `<li style="margin-bottom:5px; display:flex; align-items:center;">${r.u} ↔ ${r.v} ${costHtml}</li>`;
+    }).reverse().join(''); 
+}
+
+function setDist(d) { state.currentDist = d; document.getElementById('btn-250').classList.toggle('selected', d===250); document.getElementById('btn-500').classList.toggle('selected', d===500); }
+
+function askValidation(name) { 
+    state.currentPlayer = name; 
+    state.currentPin = Math.floor(100 + Math.random() * 899); 
+    currentTime = 0; 
+    document.getElementById('chrono-display').innerText = "0:00.0"; 
+    document.getElementById('btn-chrono-toggle').innerText = "DÉPART"; 
+    document.getElementById('btn-chrono-toggle').style.background = "var(--s)";
+    document.getElementById('qr-success-zone').style.display = "none"; 
+    document.getElementById('chrono-setup-zone').style.display = "block"; 
+    document.getElementById('qr-title').innerText = name; 
+    document.getElementById('modal-qr').style.display = 'flex'; 
+}
+
+function toggleChrono() { 
+    let btn = document.getElementById('btn-chrono-toggle'); 
+    if(!timer) { 
+        startTime = Date.now(); 
+        btn.innerText = "STOP"; 
+        btn.style.background = "var(--d)"; 
+        timer = setInterval(() => { 
+            currentTime = (Date.now() - startTime) / 1000; 
+            document.getElementById('chrono-display').innerText = formatTime(currentTime); 
+        }, 100); 
+    } else { 
+        clearInterval(timer); 
+        timer = null; 
+        btn.style.background = "var(--s)"; 
+        generateQRCode(); 
+    } 
+}
+
+function generateQRCode() { 
+    const rid = Date.now().toString().slice(-6); 
+    const dataString = ["v1", state.color, clean(state.currentPlayer), state.currentDist, currentTime.toFixed(1), 0, state.currentPin, rid].join("*"); 
+    
+    document.getElementById('chrono-setup-zone').style.display = "none"; 
+    document.getElementById('qr-success-zone').style.display = "block"; 
+    document.getElementById('display-id').innerText = rid; 
+    
+    // Insertion du chrono final dans l'encadré
+    document.getElementById('final-chrono-result').innerText = formatTime(currentTime);
+
+    const container = document.getElementById('qrcode'); 
+    container.innerHTML = ""; 
+    setTimeout(() => { 
+        new QRCode(container, { 
+            text: dataString, 
+            width: 180, 
+            height: 180, 
+            correctLevel: QRCode.CorrectLevel.L 
+        }); 
+    }, 50); 
+}
+
+function closeModalQR() { clearInterval(timer); timer = null; document.getElementById('modal-qr').style.display = 'none'; document.getElementById('input-pin').value = ""; }
+
+function calculatePoints(time, dist, sex) { 
+    const table = BAREME_PERF[sex][dist]; 
+    let pts = 0; 
+    const sorted = [...table].sort((a,b) => b.p - a.p); 
+    for(let entry of sorted) { if(time <= entry.t) { pts = entry.p; break; } } 
+    return pts.toFixed(1); 
+}
+
+function checkPin() { 
+    if(parseInt(document.getElementById('input-pin').value) === state.currentPin) { 
+        let pts = calculatePoints(currentTime, state.currentDist, state.individual[state.currentPlayer].sex); 
+        state.distance += state.currentDist; 
+        state.individual[state.currentPlayer].dist += state.currentDist; 
+        state.individual[state.currentPlayer].history.push({ d: state.currentDist, t: currentTime, pts: pts }); 
+        let nbW = (state.currentDist === 500) ? 2 : 1; 
+        closeModalQR(); 
+        document.getElementById('chance-txt').innerHTML = `<b style="font-size:1.3rem; color:var(--s);">Performance : ${pts} / 6</b><br>Bravo ! Choisis tes wagons :`; 
+        showChanceModal(nbW); 
+        saveGame(); updateUI(); 
+    } else alert("Code PIN incorrect"); 
+}
+
+function showChanceModal(rem) { 
+    if (rem <= 0) { document.getElementById('modal-chance').style.display = "none"; return; } 
+    let cs = ['jaune','orange','rose','noire','vert','bleu','rouge','blanc'], pk = cs.sort(()=>0.5-Math.random()).slice(0,4); 
+    let ct = document.getElementById('chance-buttons'); ct.innerHTML = ""; 
+    pk.forEach(c => { 
+        let b = document.createElement('button'); b.className = `wagon-pill ${c}`; b.innerText = c.toUpperCase(); 
+        b.onclick = () => { state.inv[c]++; showChanceModal(rem - 1); saveGame(); updateUI(); }; 
+        ct.appendChild(b); 
+    }); 
+    document.getElementById('modal-chance').style.display = "flex"; 
+}
+
+function buildRoute() { 
+    let a = document.getElementById('sel-a').value, b = document.getElementById('sel-b').value; 
+    let r = RAIL_DATA.find(x => (x.u===a && x.v===b) || (x.v===a && x.u===b)); 
+    if(!r || state.built.find(x=>(x.u===a && x.v===b)||(x.v===a && x.u===b))) return alert("Impossible"); 
+    
+    let coutTotal = r.cost, totalSaisi = 0, paiement = []; 
+    for (let couleur of r.col) { 
+        let stock = state.inv[couleur] || 0, reste = coutTotal - totalSaisi; 
+        if (reste > 0 && stock > 0) { 
+            let n = parseInt(prompt(`Besoin de ${coutTotal}. ${couleur.toUpperCase()} (Stock: ${stock})`, Math.min(stock, reste))) || 0; 
+            if (n > stock) return; 
+            state.inv[couleur] -= n; totalSaisi += n; 
+            if (n > 0) paiement.push({col: couleur, qte: n});
+        } 
+    } 
+    if (totalSaisi === coutTotal) { 
+        state.built.push({u:a, v:b, cost: coutTotal, details: paiement}); 
+        saveGame(); updateUI(); checkWin(); 
+    } 
+}
+
+function checkWin() { 
+    let v = new Set(), q = [state.mission.s]; 
+    while(q.length > 0) { 
+        let curr = q.shift(); 
+        if(curr === state.mission.e) { document.getElementById('modal-win').style.display='flex'; return; } 
+        v.add(curr); 
+        state.built.forEach(r => { 
+            if(r.u==curr && !v.has(r.v)) q.push(r.v); 
+            if(r.v==curr && !v.has(r.u)) q.push(r.u); 
+        }); 
+    } 
+}
+</script>
+</body>
+</html>
