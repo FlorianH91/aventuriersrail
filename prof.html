@@ -71,7 +71,7 @@ let html5QrCode = null, donneesScan = null, scores = {}, idsScannes = new Set();
 function formatMMSS(seconds) {
     if (!seconds || seconds == 0) return "--:--";
     const m = Math.floor(seconds / 60);
-    const s = Math.round(seconds % 60);
+    const s = Math.floor(seconds % 60);
     return m + ":" + s.toString().padStart(2, '0');
 }
 
@@ -111,7 +111,15 @@ function ouvrirScanner() {
         let d = {};
         if (text.startsWith("v1*")) {
             const p = text.split("*");
-            d = { team: p[1], player: p[2], distance: parseInt(p[3]), tempsRealise: parseFloat(p[4]), tempsCible: parseFloat(p[5]) || 0, pin: p[6], id: p[7] };
+            d = { 
+                team: p[1], 
+                player: p[2], 
+                distance: parseInt(p[3]) || 0, 
+                tempsRealise: parseFloat(p[4]) || 0, 
+                tempsCible: parseFloat(p[5]) || 0, 
+                pin: p[6], 
+                id: p[7] 
+            };
         } else {
             try { d = JSON.parse(text); } catch(e) { alert("Format QR inconnu"); return; }
         }
@@ -139,9 +147,9 @@ function validerScore() {
     const h = new Date().toLocaleTimeString("fr-FR", {hour:'2-digit', minute:'2-digit'});
     if (!scores[key]) scores[key] = { nom: donneesScan.player, equipe: donneesScan.team, distance: 0, cible: 0, courses: [] };
     
-    scores[key].distance += donneesScan.distance || 250;
+    scores[key].distance += donneesScan.distance || 0;
     if (donneesScan.tempsCible > 0) scores[key].cible = donneesScan.tempsCible;
-    scores[key].courses.push({ chrono: donneesScan.tempsRealise, distRun: donneesScan.distance || 250, heure: h });
+    scores[key].courses.push({ chrono: donneesScan.tempsRealise, distRun: donneesScan.distance || 0, heure: h });
     
     idsScannes.add(donneesScan.id);
     sauvegarderDonnees(); dessinerTableau();
